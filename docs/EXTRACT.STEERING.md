@@ -135,7 +135,8 @@ hf_dataset = load_dataset("CaveduckAI/steer-personality-rudeness-ko", split="tra
 # Convert to required format
 dataset = [
     {
-        "question": item["question"],
+        "situation": item["situation"],
+        "char_name: item["char_name"],
         "positive": item["positive"],
         "neutral": item["neutral"]
     }
@@ -171,7 +172,8 @@ tokenizer = AutoTokenizer.from_pretrained("google/gemma-2-2b-it")
 hf_dataset = load_dataset("CaveduckAI/steer-personality-rudeness-ko", split="train")
 dataset = [
     {
-        "question": item["question"],
+        "situation": item["situation"],
+        "char_name": item["char_name"],
         "positive": item["positive"],
         "neutral": item["neutral"]
     }
@@ -452,8 +454,8 @@ vectors = extractor.extract_steering_vector(
 
 **How It Works:**
 1. Dataset stores raw answer texts (not pre-formatted prompts)
-2. BiPO builds prompts at training time: `[Situation]...[Question]...[Answer]{full_text}`
-3. Evaluates `P(positive_answer | question)` vs `P(neutral_answer | question)`
+2. BiPO builds prompts at training time: `[situation]...[char_name]...[positive]...[neutral]...{full_text}`
+3. Evaluates `P(positive_answer)` vs `P(neutral_answer)`
 4. Optimizes steering vector to increase relative preference for positive answers
 
 **Benefits:**
