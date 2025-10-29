@@ -135,7 +135,7 @@ hf_dataset = load_dataset("CaveduckAI/steer-personality-rudeness-ko", split="tra
 # Convert to required format
 dataset = [
     {
-        "question": item["question"],
+        "situation": item["situation"],
         "positive": item["positive"],
         "neutral": item["neutral"]
     }
@@ -171,7 +171,7 @@ tokenizer = AutoTokenizer.from_pretrained("google/gemma-2-2b-it")
 hf_dataset = load_dataset("CaveduckAI/steer-personality-rudeness-ko", split="train")
 dataset = [
     {
-        "question": item["question"],
+        "situation": item["situation"],
         "positive": item["positive"],
         "neutral": item["neutral"]
     }
