@@ -150,6 +150,7 @@ class DatasetBuilder:
         top_k: int | None = None,
         top_p: float | None = None,
         max_tokens: int = 100,
+        dtype: str = None,
     ) -> Path:
         """
         Build steering dataset for given personality traits.
@@ -229,7 +230,7 @@ class DatasetBuilder:
                 )
             else:
                 self.active_model = model
-                self._load_model(model)
+                self._load_model(model, dtype=dtype)
                 assert self.model is not None and self.tokenizer is not None
                 self.p2 = P2(self.model, self.tokenizer)
 
@@ -265,7 +266,7 @@ class DatasetBuilder:
         )
         return self.build_steer_dataset(*args, **kwargs)
 
-    def _load_model(self, model_name: str) -> None:
+    def _load_model(self, model_name: str, dtype: str = None) -> None:
         """
         Load model and tokenizer from Hugging Face.
 
@@ -275,7 +276,7 @@ class DatasetBuilder:
         Raises:
             Exception: If model loading fails
         """
-        self.model, self.tokenizer = self.llm_loader.load_model(model_name)
+        self.model, self.tokenizer = self.llm_loader.load_model(model_name, None, dtype)
         self.logger.info(f"Loaded model: {model_name}")
         self.logger.info(f"Loaded tokenizer: {model_name}")
 
