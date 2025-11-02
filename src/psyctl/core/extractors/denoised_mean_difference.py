@@ -177,7 +177,7 @@ class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
             neu_acts = neutral_activations[neutral_key]  # List of tensors [N, D]
 
             # Apply PCA-enhanced CAA
-            steering_vec = self._pca_enhanced_caa(
+            steering_vec = self._pca_enhanced_md(
                 pos_acts, neu_acts, variance_threshold, layer_name
             )
 
@@ -203,7 +203,7 @@ class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
         )
         return steering_vectors
 
-    def _pca_enhanced_caa(
+    def _pca_enhanced_md(
         self,
         positive_acts: list[torch.Tensor],
         neutral_acts: list[torch.Tensor],
