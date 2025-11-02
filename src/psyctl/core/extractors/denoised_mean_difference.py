@@ -211,7 +211,7 @@ class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
         layer_name: str,
     ) -> torch.Tensor:
         """
-        Apply PCA-enhanced CAA algorithm.
+        Apply PCA-enhanced MD algorithm.
 
         Args:
             positive_acts: List of positive activation tensors [N, D]
