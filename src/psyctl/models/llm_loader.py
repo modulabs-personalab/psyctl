@@ -32,7 +32,7 @@ class LLMLoader:
             )
             return self.models[model_name], self.tokenizers[model_name]
 
-        if device is None:
+        if device is None or device == "auto":
             device = "cuda" if torch.cuda.is_available() else "cpu"
             self.logger.info(f"Auto-detected device: {device}")
         else:
@@ -48,10 +48,12 @@ class LLMLoader:
 
             # Load model
             self.logger.debug("Loading model...")
+            # Use device_map="auto" for CUDA to enable automatic multi-GPU, or None for CPU
+            device_map_value = "auto" if device == "cuda" else None
             model = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 torch_dtype="auto",
-                device_map=device if device == "cuda" else None,
+                device_map=device_map_value,
             )
 
             # Cache the loaded model and tokenizer
@@ -63,4 +65,6 @@ class LLMLoader:
 
         except Exception as e:
             self.logger.error(f"Failed to load model {model_name}: {e}")
+            raise
+
             raise

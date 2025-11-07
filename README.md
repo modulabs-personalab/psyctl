@@ -107,10 +107,11 @@ psyctl steering \
   --input-text "Tell me about yourself"
 
 # 5. Inventory test
-psyctl benchmark \
+psyctl benchmark inventory \
   --model "meta-llama/Llama-3.2-3B-Instruct" \
   --steering-vector "./steering_vector/out.safetensors" \
-  --inventory IPIP-NEO
+  --inventory "ipip_neo_120" \
+  --trait "Neuroticism"
 ```
 
 ### 📋 Commands Overview
@@ -123,7 +124,13 @@ PSYCTL provides 5 main commands. See documentation links above for detailed usag
 | `dataset.upload` | Upload datasets to HuggingFace | [Guide](./docs/DATASET.BUILD.STEER.md#uploading-to-huggingface-hub) |
 | `extract.steering` | Extract steering vectors | [Guide](./docs/EXTRACT.STEERING.md) |
 | `steering` | Apply steering to generation | [Guide](./docs/STEERING.md) |
-| `benchmark` | Test with psychological inventories | Coming soon |
+| `benchmark inventory` | Test with psychological inventories (logit-based) | See below |
+| `benchmark llm-as-judge` | Test with LLM as Judge (situation-based questions) | See below |
+| `inventory.list` | List available inventories | See below |
+
+**Benchmark Methods:**
+- **Inventory**: Uses standardized psychological inventories (e.g., IPIP-NEO) with logit-based scoring. More objective and reproducible.
+- **LLM as Judge**: Generates situation-based questions and uses an LLM to evaluate responses. More flexible and context-aware.
 
 ### 📊 Supported Inventories
 
@@ -175,11 +182,20 @@ psyctl steering \
   --steering-vector "./steering_vector/extroversion.safetensors" \
   --input-text "Tell me about yourself"
 
-# 4. Measure personality changes
-psyctl benchmark \
+# 4. Measure personality changes with inventory
+psyctl benchmark inventory \
   --model "meta-llama/Llama-3.2-3B-Instruct" \
   --steering-vector "./steering_vector/extroversion.safetensors" \
-  --inventory IPIP-NEO
+  --inventory "ipip_neo_120" \
+  --trait "Extraversion"
+
+# 5. Measure personality changes with LLM as Judge
+psyctl benchmark llm-as-judge \
+  --model "meta-llama/Llama-3.2-3B-Instruct" \
+  --steering-vector "./steering_vector/extroversion.safetensors" \
+  --trait "Extraversion" \
+  --num-questions 10 \
+  --strengths "1.0,2.0,3.0"
 ```
 
 **More Examples:**
