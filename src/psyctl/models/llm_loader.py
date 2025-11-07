@@ -22,7 +22,7 @@ class LLMLoader:
         self.tokenizers: dict[str, Any] = {}
         self.logger = get_logger("llm_loader")
 
-    def load_model(self, model_name: str, device: str | None = None) -> tuple:
+    def load_model(self, model_name: str, device: str | None = None, dtype: str | None = None) -> tuple:
         """Load model and tokenizer."""
         self.logger.info(f"Loading model: {model_name}")
 
@@ -38,6 +38,12 @@ class LLMLoader:
         else:
             self.logger.info(f"Using specified device: {device}")
 
+        if dtype is None:
+            dtype = 'auto'
+            trust_remote_code = False
+        else:
+            trust_remote_code = True
+
         try:
             # Load tokenizer
             self.logger.debug("Loading tokenizer...")
@@ -52,7 +58,8 @@ class LLMLoader:
             device_map_value = "auto" if device == "cuda" else None
             model = AutoModelForCausalLM.from_pretrained(
                 model_name,
-                torch_dtype="auto",
+                dtype=dtype,
+                trust_remote_code=trust_remote_code,
                 device_map=device_map_value,
             )
 
@@ -65,6 +72,4 @@ class LLMLoader:
 
         except Exception as e:
             self.logger.error(f"Failed to load model {model_name}: {e}")
-            raise
-
             raise

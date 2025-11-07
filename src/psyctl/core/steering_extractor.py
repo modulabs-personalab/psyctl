@@ -11,8 +11,8 @@ from transformers import AutoTokenizer
 
 from psyctl.core.extractors import (
     BiPOVectorExtractor,
-    MeanContrastiveActivationVectorExtractor,
-    PcaCaaExtractor,
+    DenoisedMeanDifferenceVectorExtractor,
+    MeanDifferenceActivationVectorExtractor,
 )
 from psyctl.core.logger import get_logger
 from psyctl.core.utils import validate_tokenizer_padding
@@ -24,9 +24,9 @@ class SteeringExtractor:
     """Extract steering vectors using various methods."""
 
     EXTRACTORS: ClassVar[dict[str, type]] = {
-        "mean_diff": MeanContrastiveActivationVectorExtractor,
+        "mean_diff": MeanDifferenceActivationVectorExtractor,
         "bipo": BiPOVectorExtractor,
-        "pca_caa": PcaCaaExtractor,
+        "denoised_mean_diff": DenoisedMeanDifferenceVectorExtractor,
     }
 
     def __init__(self):
@@ -114,13 +114,13 @@ class SteeringExtractor:
             ...     output_path=Path("./out.safetensors")
             ... )
 
-            >>> # Example 5: Using PCA-enhanced CAA method
+            >>> # Example 5: Using denoised mean difference method
             >>> vectors = extractor.extract_steering_vector(
             ...     model_name="google/gemma-2-2b-it",
             ...     layers=["model.layers.13.mlp.down_proj"],
             ...     dataset_path=Path("./dataset/steering"),
             ...     output_path=Path("./out.safetensors"),
-            ...     method="pca_caa",
+            ...     method="denoised_mean_diff",
             ...     variance_threshold=0.95
             ... )
         """

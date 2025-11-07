@@ -128,9 +128,9 @@ Models Layer (models/)
 
 **2. Steering Extractor (`core/steering_extractor.py`)**
 - Coordinates extraction using pluggable extractor classes
-- Two extraction methods:
-  - **mean_diff** (`extractors/mean_contrastive.py`): Computes mean activation difference between positive/neutral responses
-  - **pca_caa** (`extractors/pca_caa.py`): PCA-enhanced CAA for noise reduction and improved robustness (variance threshold: 0.95)
+- Three extraction methods:
+  - **mean_diff** (`extractors/mean_difference.py`): Computes mean activation difference between positive/neutral responses
+  - **denoised_mean_diff** (`extractors/denoised_mean_difference.py`): PCA-based denoising for noise reduction and improved robustness (variance threshold: 0.95)
   - **bipo** (`extractors/bipo.py`): Bidirectional Preference Optimization using DPO loss
 - Layer specification via string paths (e.g., `"model.layers[13].mlp.down_proj"`)
 - Uses `LayerAccessor` for dynamic layer access
@@ -187,7 +187,8 @@ src/psyctl/
 │   ├── inventory_tester.py  # Psychological inventory testing
 │   ├── extractors/          # Extraction methods
 │   │   ├── base.py         # Base extractor interface
-│   │   ├── mean_contrastive.py # Mean difference (CAA)
+│   │   ├── mean_difference.py # Mean difference
+│   │   ├── denoised_mean_difference.py # PCA-based denoising
 │   │   └── bipo.py         # BiPO method
 │   ├── analyzers/          # Layer analysis tools
 │   │   ├── base.py         # Base analyzer interface
@@ -409,8 +410,8 @@ from psyctl.core.extractors.my_method import MyMethodExtractor
 
 class SteeringExtractor:
     EXTRACTORS = {
-        'mean_diff': MeanContrastiveActivationVectorExtractor,
-        'pca_caa': PcaCaaExtractor,
+        'mean_diff': MeanDifferenceActivationVectorExtractor,
+        'denoised_mean_diff': DenoisedMeanDifferenceVectorExtractor,
         'bipo': BiPOVectorExtractor,
         'my_method': MyMethodExtractor,  # Add here
     }
@@ -419,7 +420,7 @@ class SteeringExtractor:
 3. **Add CLI option** in `commands/extract.py`:
 ```python
 @click.option("--method", default="mean_diff",
-              help="Extraction method: mean_diff, pca_caa, bipo, my_method")
+              help="Extraction method: mean_diff, denoised_mean_diff, bipo, my_method")
 ```
 
 4. **Add tests** in `tests/test_core/test_extractors/test_my_method.py`

@@ -53,7 +53,7 @@ logger = get_logger("extract")
     "--method",
     type=str,
     default="mean_diff",
-    help="Extraction method: mean_diff, pca_caa (PCA-enhanced CAA), or bipo (preference optimization)",
+    help="Extraction method: mean_diff, denoised_mean_diff (PCA-based denoising), or bipo (preference optimization)",
 )
 @click.option(
     "--lr",
@@ -77,7 +77,7 @@ logger = get_logger("extract")
     "--variance-threshold",
     type=float,
     default=0.95,
-    help="PCA variance threshold for pca_caa method (default: 0.95, keeps 95%% of variance)",
+    help="PCA variance threshold for denoised_mean_diff method (default: 0.95, keeps 95%% of variance)",
 )
 def steering(
     model: str,
@@ -94,15 +94,15 @@ def steering(
     variance_threshold: float,
 ):
     """
-    Extract steering vectors using various methods (CAA, PCA-CAA, or BiPO).
+    Extract steering vectors using various methods.
 
     Supports single or multi-layer extraction. Specify layers using either:
     - Multiple --layer flags: --layer "model.layers[13].mlp.down_proj" --layer "model.layers[14].mlp.down_proj"
     - Comma-separated --layers: --layers "model.layers[13].mlp.down_proj,model.layers[14].mlp.down_proj"
 
     Methods:
-    - mean_diff: Fast statistical method using mean activation difference (MD from CAA paper)
-    - pca_caa: PCA-enhanced CAA for noise reduction and improved robustness
+    - mean_diff: Fast statistical method using mean activation difference (default)
+    - denoised_mean_diff: PCA-based denoising for noise reduction and improved robustness
     - bipo: Optimization-based method using preference learning
 
     Examples:
@@ -116,13 +116,13 @@ def steering(
       --output "./steering_vector/out.safetensors"
 
     \b
-    # PCA-enhanced CAA method (denoised, more robust)
+    # denoised_mean_diff method (PCA-based denoising, more robust)
     psyctl extract.steering \\
       --model "meta-llama/Llama-3.2-3B-Instruct" \\
       --layer "model.layers[13].mlp.down_proj" \\
       --dataset "./dataset/steering" \\
       --output "./steering_vector/out.safetensors" \\
-      --method pca_caa \\
+      --method denoised_mean_diff \\
       --variance-threshold 0.95
 
     \b
@@ -138,13 +138,13 @@ def steering(
       --epochs 10
 
     \b
-    # Multi-layer extraction with PCA-CAA
+    # Multi-layer extraction with denoised mean difference
     psyctl extract.steering \\
       --model "meta-llama/Llama-3.2-3B-Instruct" \\
       --layers "model.layers[13].mlp.down_proj,model.layers[14].mlp.down_proj" \\
       --dataset "./dataset/steering" \\
       --output "./steering_vector/out.safetensors" \\
-      --method pca_caa
+      --method denoised_mean_diff
     """
     logger.info("Starting steering vector extraction")
     logger.info(f"Model: {model}")
@@ -192,8 +192,8 @@ def steering(
         console.print(f"  - Learning rate: {lr}")
         console.print(f"  - Beta: {beta}")
         console.print(f"  - Epochs: {epochs}")
-    elif method == "pca_caa":
-        console.print("[yellow]PCA-CAA Parameters:[/yellow]")
+    elif method == "denoised_mean_diff":
+        console.print("[yellow]Denoised Mean Difference Parameters:[/yellow]")
         console.print(f"  - Variance threshold: {variance_threshold:.2%}")
 
     try:
@@ -207,7 +207,7 @@ def steering(
                 "beta": beta,
                 "epochs": epochs,
             }
-        elif method == "pca_caa":
+        elif method == "denoised_mean_diff":
             method_params = {
                 "variance_threshold": variance_threshold,
             }

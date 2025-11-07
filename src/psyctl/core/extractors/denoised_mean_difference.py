@@ -1,4 +1,4 @@
-"""PCA-Enhanced Contrastive Activation Addition extractor."""
+"""Denoised Mean Difference extractor using PCA-based noise reduction."""
 
 from __future__ import annotations
 
@@ -19,12 +19,12 @@ from psyctl.core.logger import get_logger
 from psyctl.core.steer_dataset_loader import SteerDatasetLoader
 
 
-class PcaCaaExtractor(BaseVectorExtractor):
+class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
     """
-    Extract steering vectors using PCA-enhanced Contrastive Activation Addition.
+    Extract steering vectors using denoised mean difference.
 
-    This extractor improves upon basic CAA by applying PCA-based denoising to address
-    noise and partially address polysemanticity in activation spaces.
+    This extractor improves upon basic mean difference by applying PCA-based denoising
+    to remove noise from low-variance directions and focus on high-variance structure.
 
     Algorithm:
     1. Collect activations from positive and neutral prompts
@@ -33,13 +33,14 @@ class PcaCaaExtractor(BaseVectorExtractor):
     4. Project steering vector onto top-K principal components (95% variance)
     5. Reconstruct denoised steering vector
 
-    Benefits over raw CAA:
+    Benefits over basic mean difference:
     - Removes noise (low-variance directions)
     - Focuses on high-variance shared structure
     - Partially addresses polysemanticity
-    - No hyperparameters to tune (95% variance threshold)
+    - Configurable variance threshold (default: 0.95)
 
-    Cost: O(NxD²) - Same as BiPO but without backpropagation
+    Implementation: Uses PCA for denoising (can be replaced with other methods)
+    Cost: O(NxD²) for PCA fitting
 
     Attributes:
         hook_manager: Manager for forward hooks
@@ -49,11 +50,11 @@ class PcaCaaExtractor(BaseVectorExtractor):
     """
 
     def __init__(self):
-        """Initialize PcaCaaExtractor."""
+        """Initialize DenoisedMeanDifferenceVectorExtractor."""
         self.hook_manager = ActivationHookManager()
         self.dataset_loader = SteerDatasetLoader()
         self.layer_accessor = LayerAccessor()
-        self.logger = get_logger("pca_caa_extractor")
+        self.logger = get_logger("denoised_mean_diff")
 
     def extract(
         self,
@@ -88,7 +89,7 @@ class PcaCaaExtractor(BaseVectorExtractor):
             ValueError: If neither dataset_path nor dataset is provided, or both are provided
 
         Example:
-            >>> extractor = PCA_CAA_Extractor()
+            >>> extractor = DenoisedMeanDifferenceVectorExtractor()
             >>> vectors = extractor.extract(
             ...     model=model,
             ...     tokenizer=tokenizer,
@@ -222,8 +223,9 @@ class PcaCaaExtractor(BaseVectorExtractor):
             PCA-denoised steering vector [D]
         """
         # Stack activations into matrices
-        pos_matrix = torch.vstack(positive_acts).cpu().numpy()  # [N_pos, D]
-        neu_matrix = torch.vstack(neutral_acts).cpu().numpy()  # [N_neu, D]
+        # Convert to float32 first (sklearn doesn't support bfloat16)
+        pos_matrix = torch.vstack(positive_acts).float().cpu().numpy()  # [N_pos, D]
+        neu_matrix = torch.vstack(neutral_acts).float().cpu().numpy()  # [N_neu, D]
 
         # Compute raw steering vector (mean difference)
         pos_mean = pos_matrix.mean(axis=0)  # [D]

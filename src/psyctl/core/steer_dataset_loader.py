@@ -236,6 +236,10 @@ class SteerDatasetLoader:
         """
         Build prompt with multiple choices for CAA extraction method.
 
+        This method constructs prompts to extract activation from the answer token,
+        not from special tokens like <end_of_turn>. It applies chat template to the
+        question part only, then appends the answer selection outside the template.
+
         Args:
             situation: Situation description
             char_name: Character name
@@ -246,6 +250,10 @@ class SteerDatasetLoader:
 
         Returns:
             Complete prompt with choices and selection
+
+        Note:
+            The answer is appended AFTER chat template application to ensure
+            the last token is from answer content, matching PoC behavior.
         """
         # Load template
         template = self.jinja_env.get_template("md_question.j2")
@@ -256,20 +264,20 @@ class SteerDatasetLoader:
             answer_2=answer_2.strip().replace("\n", ""),
         )
 
-        # Append selected index
-        full_text = f"{question}{selected}"
-
-        # Apply chat template if available
+        # Apply chat template WITHOUT answer (add_generation_prompt=True)
         try:
-            messages = [{"role": "user", "content": full_text}]
+            messages = [{"role": "user", "content": question}]
             prompt = tokenizer.apply_chat_template(  # type: ignore[call-arg]
                 messages,
                 tokenize=False,
-                add_generation_prompt=False,
+                add_generation_prompt=True,  # Add <start_of_turn>model section
             )
+            # Append answer AFTER chat template to ensure last token is answer content
+            prompt = prompt + selected
         except Exception as e:
             self.logger.debug(f"Chat template failed, using raw text: {e}")
-            prompt = full_text
+            # Fallback: concatenate directly
+            prompt = question + selected
 
         return prompt
 
@@ -279,6 +287,10 @@ class SteerDatasetLoader:
         """
         Build BiPO-style prompt with direct answer (no choices shown).
 
+        This method constructs prompts to extract activation from the answer token,
+        not from special tokens. It applies chat template to the question part only,
+        then appends the answer outside the template.
+
         Args:
             situation: Situation description
             char_name: Character name
@@ -287,21 +299,28 @@ class SteerDatasetLoader:
 
         Returns:
             Complete prompt with direct answer
-        """
-        # Simple format for BiPO
-        full_text = f"[Situation]\n{situation}\n[Question]\nYou are {char_name}. What would your response be in this situation?\n[Answer]\n{answer}"
 
-        # Apply chat template if available
+        Note:
+            The answer is appended AFTER chat template application to ensure
+            the last token is from answer content, matching PoC behavior.
+        """
+        # Build question without answer
+        question = f"[Situation]\n{situation}\n[Question]\nYou are {char_name}. What would your response be in this situation?\n[Answer]\n"
+
+        # Apply chat template WITHOUT answer (add_generation_prompt=True)
         try:
-            messages = [{"role": "user", "content": full_text}]
+            messages = [{"role": "user", "content": question}]
             prompt = tokenizer.apply_chat_template(  # type: ignore[call-arg]
                 messages,
                 tokenize=False,
-                add_generation_prompt=False,
+                add_generation_prompt=True,  # Add <start_of_turn>model section
             )
+            # Append answer AFTER chat template to ensure last token is answer content
+            prompt = prompt + answer
         except Exception as e:
             self.logger.debug(f"Chat template failed, using raw text: {e}")
-            prompt = full_text
+            # Fallback: concatenate directly
+            prompt = question + answer
 
         return prompt
 

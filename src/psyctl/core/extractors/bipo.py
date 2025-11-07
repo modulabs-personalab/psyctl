@@ -424,7 +424,7 @@ class BiPOVectorExtractor(BaseVectorExtractor):
             ratio_neg = log_prob_neg_steered - log_prob_neg_orig
 
             logits = d * beta * (ratio_pos - ratio_neg)
-            loss = -torch.log(torch.sigmoid(logits))
+            loss = -torch.nn.functional.logsigmoid(logits)
 
             total_loss = loss if total_loss is None else total_loss + loss
 
@@ -459,11 +459,12 @@ class BiPOVectorExtractor(BaseVectorExtractor):
             Sum of log probabilities for response tokens
         """
         # Build prompt: situation + question + full answer
-        question_text = f"[Situation]\n{situation}\n[Question]\nYou are {char_name}. What would your response be in this situation?\n[Answer]\n"
+        # question_text = f"[Situation]\n{situation}\n[Question]\nYou are {char_name}. What would your response be in this situation?\n[Answer]\n"
+        question_text = f"{situation}"
 
         # Apply chat template
-        question_text = self._format_with_chat_template(tokenizer, question_text)
-        full_text = question_text + response
+        # question_text = self._format_with_chat_template(tokenizer, question_text)
+        full_text = question_text + ' ' + response
 
         tokens = tokenizer(  # type: ignore[call-arg]
             full_text, return_tensors="pt", max_length=512, truncation=True

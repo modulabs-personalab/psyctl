@@ -110,7 +110,7 @@ from psyctl.core.extractors.my_method_extractor import MyMethodExtractor
 
 class SteeringExtractor:
     EXTRACTORS = {
-        'mean_diff': MeanContrastiveActivationVectorExtractor,
+        'mean_diff': MeanDifferenceActivationVectorExtractor,
         'bipo': BiPOVectorExtractor,
         'my_method': MyMethodExtractor,  # Add your extractor
     }
