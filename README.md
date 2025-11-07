@@ -131,6 +131,11 @@ PSYCTL provides 5 main commands. See documentation links above for detailed usag
 **Benchmark Methods:**
 - **Inventory**: Uses standardized psychological inventories (e.g., IPIP-NEO) with logit-based scoring. More objective and reproducible.
 - **LLM as Judge**: Generates situation-based questions and uses an LLM to evaluate responses. More flexible and context-aware.
+  - For API-based judges (OpenAI, OpenRouter), set environment variables:
+    - `OPENAI_API_KEY` for OpenAI models
+    - `OPENROUTER_API_KEY` for OpenRouter models
+  - For local models, use `local-default` (reuses target model) or configure custom model path in `benchmark_config.json`
+  - For custom API servers, edit `benchmark_config.json` to add your server configuration
 
 ### 📊 Supported Inventories
 
@@ -190,10 +195,15 @@ psyctl benchmark inventory \
   --trait "Extraversion"
 
 # 5. Measure personality changes with LLM as Judge
+# Note: For API-based judges, set environment variables:
+#   export OPENAI_API_KEY="your-key"        # For OpenAI models
+#   export OPENROUTER_API_KEY="your-key"    # For OpenRouter models
+# Or configure custom API server in benchmark_config.json
 psyctl benchmark llm-as-judge \
   --model "meta-llama/Llama-3.2-3B-Instruct" \
   --steering-vector "./steering_vector/extroversion.safetensors" \
   --trait "Extraversion" \
+  --judge-model "local-default" \
   --num-questions 10 \
   --strengths "1.0,2.0,3.0"
 ```

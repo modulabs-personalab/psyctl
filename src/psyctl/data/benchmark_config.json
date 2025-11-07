@@ -52,11 +52,11 @@
       "device": "auto",
       "description": "Use the same model as the target model for judging (memory efficient)"
     },
-    "local-qwen": {
+    "local-custom": {
       "type": "local",
-      "model_path": "/workspace/models/Qwen3-8B",
+      "model_path": "path/to/your/local/model",
       "device": "auto",
-      "description": "Local Qwen3-8B model for judging"
+      "description": "Custom local model for judging (update model_path)"
     },
     "gpt-4": {
       "type": "api",
@@ -72,11 +72,11 @@
       "api_key_env": "OPENAI_API_KEY",
       "description": "OpenAI GPT-4 Turbo via API"
     },
-    "gpt-oss-120b": {
+    "local-vllm": {
       "type": "api",
-      "api_base": "http://vllm-h100-pnode5-service:8000/v1/completions",
-      "model_name": "gpt-oss-120b",
-      "description": "Internal vLLM GPT-OSS 120B model"
+      "api_base": "http://localhost:8000/v1/completions",
+      "model_name": "your-model-name",
+      "description": "Local vLLM server (update api_base and model_name)"
     },
     "openrouter-claude": {
       "type": "api",
