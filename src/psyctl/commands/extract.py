@@ -79,6 +79,11 @@ logger = get_logger("extract")
     default=0.95,
     help="PCA variance threshold for denoised_mean_diff method (default: 0.95, keeps 95%% of variance)",
 )
+@click.option(
+    "--use-chat-template/--no-chat-template",
+    default=True,
+    help="Use chat template for prompt formatting (default: enabled)",
+)
 def steering(
     model: str,
     layer: tuple[str],
@@ -92,6 +97,7 @@ def steering(
     beta: float,
     epochs: int,
     variance_threshold: float,
+    use_chat_template: bool,
 ):
     """
     Extract steering vectors using various methods.
@@ -151,6 +157,7 @@ def steering(
     logger.info(f"Dataset: {dataset}")
     logger.info(f"Output: {output}")
     logger.info(f"Method: {method}")
+    logger.info(f"Use chat template: {use_chat_template}")
 
     # Parse layer arguments
     layer_list = []
@@ -181,6 +188,7 @@ def steering(
     console.print(f"Dataset: [cyan]{dataset}[/cyan]")
     console.print(f"Output: [cyan]{output}[/cyan]")
     console.print(f"Method: [cyan]{method}[/cyan]")
+    console.print(f"Use chat template: [cyan]{use_chat_template}[/cyan]")
     if normalize:
         console.print("[yellow]Normalization: Enabled[/yellow]")
     if batch_size:
@@ -220,6 +228,7 @@ def steering(
             batch_size=batch_size,
             normalize=normalize,
             method=method,
+            use_chat_template=use_chat_template,
             **method_params,  # type: ignore[arg-type]
         )
 

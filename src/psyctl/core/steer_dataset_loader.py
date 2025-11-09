@@ -132,8 +132,13 @@ class SteerDatasetLoader:
         return dataset
 
     def create_prompts(
-        self, dataset: list[dict], tokenizer: AutoTokenizer, format_type: str = "index"
-    ) -> tuple[list[str], list[str]]:
+        self,
+        dataset: list[dict],
+        tokenizer: AutoTokenizer,
+        format_type: str = "index",
+        use_chat_template: bool = True,
+        return_questions: bool = False,
+    ) -> tuple[list[str], list[str]] | tuple[list[str], list[str], list[str]]:
         """
         Create positive and neutral prompt pairs from dataset.
 
@@ -143,14 +148,19 @@ class SteerDatasetLoader:
             format_type: Prompt format type
                 - "index": Multiple choice with indices (for CAA)
                 - "direct": Direct answer (for BiPO full text)
+            use_chat_template: Whether to use chat template
+            return_questions: If True, also return question prompts (for BiPO to calculate answer token positions)
 
         Returns:
-            Tuple of (positive_prompts, neutral_prompts)
+            If return_questions=False: Tuple of (positive_prompts, neutral_prompts)
+            If return_questions=True: Tuple of (positive_prompts, neutral_prompts, question_prompts)
 
         Example:
             >>> loader = SteerDatasetLoader()
             >>> dataset = loader.load(Path("./dataset/steering"))
             >>> pos_prompts, neu_prompts = loader.create_prompts(dataset, tokenizer)
+            >>> # For BiPO (needs question lengths)
+            >>> pos_prompts, neu_prompts, questions = loader.create_prompts(dataset, tokenizer, format_type="direct", return_questions=True)
         """
         self.logger.info(
             f"Creating prompts from {len(dataset)} dataset entries (format: {format_type})"
@@ -158,6 +168,7 @@ class SteerDatasetLoader:
 
         positive_prompts = []
         neutral_prompts = []
+        question_prompts = [] if return_questions else None
 
         for idx, entry in enumerate(dataset):
             situation = entry["situation"]
@@ -178,6 +189,7 @@ class SteerDatasetLoader:
                         neutral_answer,
                         "(1",
                         tokenizer,
+                        use_chat_template,
                     )
                     neutral_prompt = self._build_prompt_with_choices(
                         situation,
@@ -186,6 +198,7 @@ class SteerDatasetLoader:
                         neutral_answer,
                         "(2",
                         tokenizer,
+                        use_chat_template,
                     )
                 else:
                     # Odd: positive=(2, neutral=(1 (swapped order)
@@ -196,6 +209,7 @@ class SteerDatasetLoader:
                         positive_answer,
                         "(2",
                         tokenizer,
+                        use_chat_template,
                     )
                     neutral_prompt = self._build_prompt_with_choices(
                         situation,
@@ -204,14 +218,22 @@ class SteerDatasetLoader:
                         positive_answer,
                         "(1",
                         tokenizer,
+                        use_chat_template,
                     )
             elif format_type == "direct":
                 # BiPO format: direct answer without choices
+                if return_questions:
+                    # Build question prompt (without answer)
+                    question_prompt = self._build_question_only(
+                        situation, char_name, tokenizer, use_chat_template
+                    )
+                    question_prompts.append(question_prompt)  # type: ignore[union-attr]
+
                 positive_prompt = self._build_prompt_direct(
-                    situation, char_name, positive_answer, tokenizer
+                    situation, char_name, positive_answer, tokenizer, use_chat_template
                 )
                 neutral_prompt = self._build_prompt_direct(
-                    situation, char_name, neutral_answer, tokenizer
+                    situation, char_name, neutral_answer, tokenizer, use_chat_template
                 )
             else:
                 raise ValueError(f"Unknown format_type: {format_type}")
@@ -222,6 +244,9 @@ class SteerDatasetLoader:
         self.logger.info(
             f"Created {len(positive_prompts)} positive and {len(neutral_prompts)} neutral prompts"
         )
+
+        if return_questions:
+            return positive_prompts, neutral_prompts, question_prompts  # type: ignore[return-value]
         return positive_prompts, neutral_prompts
 
     def _build_prompt_with_choices(
@@ -232,6 +257,7 @@ class SteerDatasetLoader:
         answer_2: str,
         selected: str,
         tokenizer: AutoTokenizer,
+        use_chat_template: bool = True,
     ) -> str:
         """
         Build prompt with multiple choices for CAA extraction method.
@@ -247,7 +273,7 @@ class SteerDatasetLoader:
             answer_2: Second answer option
             selected: Which answer is selected ("(1" or "(2")
             tokenizer: Tokenizer for chat template
-
+            use_chat_template: Whether to use chat template
         Returns:
             Complete prompt with choices and selection
 
@@ -266,23 +292,73 @@ class SteerDatasetLoader:
 
         # Apply chat template WITHOUT answer (add_generation_prompt=True)
         try:
-            messages = [{"role": "user", "content": question}]
-            prompt = tokenizer.apply_chat_template(  # type: ignore[call-arg]
-                messages,
-                tokenize=False,
-                add_generation_prompt=True,  # Add <start_of_turn>model section
-            )
-            # Append answer AFTER chat template to ensure last token is answer content
-            prompt = prompt + selected
+            if use_chat_template:
+                messages = [{"role": "user", "content": question}]
+                prompt = tokenizer.apply_chat_template(  # type: ignore[call-arg]
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True,  # Add <start_of_turn>model section
+                )
+                return prompt + selected
+            else:
+                return question + selected
         except Exception as e:
             self.logger.debug(f"Chat template failed, using raw text: {e}")
-            # Fallback: concatenate directly
-            prompt = question + selected
+            return question + selected
 
-        return prompt
+    def _build_question_only(
+        self,
+        situation: str,
+        char_name: str,
+        tokenizer: AutoTokenizer,
+        use_chat_template: bool = True,
+    ) -> str:
+        """
+        Build question prompt without answer (for BiPO token length calculation).
+
+        Args:
+            situation: Situation description
+            char_name: Character name
+            tokenizer: Tokenizer for chat template
+            use_chat_template: Whether to use chat template
+
+        Returns:
+            Question prompt without answer
+
+        Note:
+            This is used by BiPO to calculate the question length,
+            so it can identify which tokens are from the answer.
+        """
+        # Build question without answer
+        template = self.jinja_env.get_template("bipo_question.j2")
+        question = template.render(
+            char_name=char_name,
+            situation=situation.strip(),
+        )
+
+        # Apply chat template WITHOUT answer (add_generation_prompt=True)
+        try:
+            if use_chat_template:
+                messages = [{"role": "user", "content": question}]
+                prompt = tokenizer.apply_chat_template(  # type: ignore[call-arg]
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True,  # Add <start_of_turn>model section
+                )
+                return prompt
+            else:
+                return question
+        except Exception as e:
+            self.logger.debug(f"Chat template failed, using raw text: {e}")
+            return question
 
     def _build_prompt_direct(
-        self, situation: str, char_name: str, answer: str, tokenizer: AutoTokenizer
+        self,
+        situation: str,
+        char_name: str,
+        answer: str,
+        tokenizer: AutoTokenizer,
+        use_chat_template: bool = True,
     ) -> str:
         """
         Build BiPO-style prompt with direct answer (no choices shown).
@@ -296,7 +372,7 @@ class SteerDatasetLoader:
             char_name: Character name
             answer: The answer text
             tokenizer: Tokenizer for chat template
-
+            use_chat_template: Whether to use chat template
         Returns:
             Complete prompt with direct answer
 
@@ -305,24 +381,28 @@ class SteerDatasetLoader:
             the last token is from answer content, matching PoC behavior.
         """
         # Build question without answer
-        question = f"[Situation]\n{situation}\n[Question]\nYou are {char_name}. What would your response be in this situation?\n[Answer]\n"
+        template = self.jinja_env.get_template("bipo_question.j2")
+        question = template.render(
+            char_name=char_name,
+            situation=situation.strip(),
+        )
 
         # Apply chat template WITHOUT answer (add_generation_prompt=True)
         try:
-            messages = [{"role": "user", "content": question}]
-            prompt = tokenizer.apply_chat_template(  # type: ignore[call-arg]
-                messages,
-                tokenize=False,
-                add_generation_prompt=True,  # Add <start_of_turn>model section
-            )
-            # Append answer AFTER chat template to ensure last token is answer content
-            prompt = prompt + answer
+            if use_chat_template:
+                messages = [{"role": "user", "content": question}]
+                prompt = tokenizer.apply_chat_template(  # type: ignore[call-arg]
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True,  # Add <start_of_turn>model section
+                )
+                prompt = prompt + answer
+            else:
+                prompt = question
+            return prompt + answer
         except Exception as e:
             self.logger.debug(f"Chat template failed, using raw text: {e}")
-            # Fallback: concatenate directly
-            prompt = question + answer
-
-        return prompt
+            return question + answer
 
     def get_batch_iterator(
         self, prompts: list[str], batch_size: int

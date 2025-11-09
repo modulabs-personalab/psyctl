@@ -66,6 +66,7 @@ class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
         batch_size: int | None = None,
         normalize: bool = False,
         variance_threshold: float = 0.95,
+        use_chat_template: bool = True,
         **kwargs,
     ) -> dict[str, torch.Tensor]:
         """
@@ -80,6 +81,7 @@ class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
             batch_size: Batch size for inference (default: from config)
             normalize: Whether to normalize vectors to unit length
             variance_threshold: PCA variance threshold (default: 0.95 = keep 95% variance)
+            use_chat_template: Whether to use chat template for prompt formatting (default: True)
             **kwargs: Additional parameters (unused)
 
         Returns:
@@ -116,6 +118,7 @@ class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
         self.logger.info(f"Batch size: {batch_size}")
         self.logger.info(f"Variance threshold: {variance_threshold}")
         self.logger.info(f"Normalize: {normalize}")
+        self.logger.info(f"Use chat template: {use_chat_template}")
 
         # 1. Validate layers
         self.logger.info("Validating layer paths...")
@@ -130,7 +133,7 @@ class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
             self.logger.info("Using pre-loaded dataset...")
 
         positive_prompts, neutral_prompts = self.dataset_loader.create_prompts(
-            dataset, tokenizer
+            dataset, tokenizer, format_type="index", use_chat_template=use_chat_template
         )
 
         self.logger.info(

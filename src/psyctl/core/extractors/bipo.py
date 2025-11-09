@@ -63,6 +63,7 @@ class BiPOVectorExtractor(BaseVectorExtractor):
         beta: float = 0.1,
         epochs: int = 10,
         weight_decay: float = 0.01,
+        use_chat_template: bool = True,
         **kwargs,
     ) -> dict[str, torch.Tensor]:
         """
@@ -82,6 +83,7 @@ class BiPOVectorExtractor(BaseVectorExtractor):
             beta: Temperature parameter for BiPO loss (default: 0.1)
             epochs: Number of training epochs (default: 10)
             weight_decay: Weight decay for AdamW optimizer (default: 0.01)
+            use_chat_template: Whether to use chat template for prompt formatting (default: True)
             **kwargs: Additional parameters (unused)
 
         Returns:
@@ -120,6 +122,7 @@ class BiPOVectorExtractor(BaseVectorExtractor):
         self.logger.info(f"Beta: {beta}")
         self.logger.info(f"Epochs: {epochs}")
         self.logger.info(f"Normalize: {normalize}")
+        self.logger.info(f"Use chat template: {use_chat_template}")
 
         # 1. Validate layers
         self.logger.info("Validating layer paths...")
@@ -161,6 +164,7 @@ class BiPOVectorExtractor(BaseVectorExtractor):
                 beta=beta,
                 epochs=epochs,
                 weight_decay=weight_decay,
+                use_chat_template=use_chat_template,
             )
 
             if normalize:
@@ -200,6 +204,7 @@ class BiPOVectorExtractor(BaseVectorExtractor):
         beta: float,
         epochs: int,
         weight_decay: float,
+        use_chat_template: bool,
     ) -> torch.Tensor:
         """
         Train a single steering vector using BiPO optimization.
@@ -216,6 +221,7 @@ class BiPOVectorExtractor(BaseVectorExtractor):
             beta: BiPO temperature parameter
             epochs: Number of training epochs
             weight_decay: Weight decay for optimizer
+            use_chat_template: Whether to use chat template for prompts
 
         Returns:
             Optimized steering vector
@@ -257,8 +263,23 @@ class BiPOVectorExtractor(BaseVectorExtractor):
         )  # type: ignore[arg-type]
         optimizer = AdamW([v], lr=lr, weight_decay=weight_decay)
 
-        # Prepare dataset
-        dataset_samples = self._prepare_dataset(dataset, tokenizer)
+        # Prepare dataset using SteerDatasetLoader with return_questions=True
+        # BiPO calculates log probability of ANSWER tokens only, not the full prompt
+        result = self.dataset_loader.create_prompts(
+            dataset,
+            tokenizer,
+            format_type="direct",
+            use_chat_template=use_chat_template,
+            return_questions=True,
+        )
+
+        # Unpack the result (we know it's a 3-tuple when return_questions=True)
+        positive_prompts, neutral_prompts, question_prompts = result  # type: ignore[misc]
+
+        # Create dataset samples as (question, positive_full, neutral_full) tuples
+        dataset_samples: list[tuple[str, str, str]] = list(
+            zip(question_prompts, positive_prompts, neutral_prompts)
+        )
 
         # Training loop
         for epoch in range(epochs):
@@ -314,56 +335,25 @@ class BiPOVectorExtractor(BaseVectorExtractor):
 
         return v.detach().clone()
 
-    def _prepare_dataset(
-        self, dataset: list[dict], tokenizer: AutoTokenizer
-    ) -> list[tuple]:
-        """
-        Prepare dataset samples for BiPO training.
-
-        BiPO always uses full answer texts for preference learning.
-
-        Args:
-            dataset: Raw dataset
-            tokenizer: Tokenizer
-
-        Returns:
-            List of (situation, char_name, positive_response, neutral_response) tuples
-        """
-        samples = []
-
-        for item in dataset:
-            situation = item["situation"]
-            char_name = item["char_name"]
-            positive = item["positive"]
-            neutral = item["neutral"]
-
-            samples.append((situation, char_name, positive, neutral))
-
-        self.logger.info(
-            f"Prepared {len(samples)} training samples using full answer texts"
-        )
-
-        return samples
-
     def _compute_bipo_loss(
         self,
         model: nn.Module,
         tokenizer: AutoTokenizer,
         layer_module: nn.Module,
-        batch: list[tuple],
+        batch: list[tuple[str, str, str]],
         v: torch.Tensor,
         beta: float,
     ) -> torch.Tensor:
         """
         Compute BiPO loss for a batch.
 
-        BiPO always uses full text format for preference learning.
+        BiPO calculates log probability of ANSWER tokens only.
 
         Args:
             model: Language model
             tokenizer: Tokenizer
             layer_module: Target layer
-            batch: List of (situation, char_name, positive, neutral) tuples
+            batch: List of (question_prompt, positive_full_prompt, neutral_full_prompt) tuples
             v: Current steering vector
             beta: Temperature parameter
 
@@ -374,47 +364,39 @@ class BiPOVectorExtractor(BaseVectorExtractor):
         d = random.choice([-1, 1])
         total_loss = None
 
-        for situation, char_name, positive_resp, negative_resp in batch:
-            # BiPO always uses full text format: evaluate P(full_answer | question)
-            pos_resp_text = positive_resp
-            neg_resp_text = negative_resp
-
-            # Original log probabilities
+        for question_prompt, positive_prompt, neutral_prompt in batch:
+            # Original log probabilities (answer tokens only)
             log_prob_pos_orig = self._get_response_logprob(
                 model,
                 tokenizer,
-                situation,
-                char_name,
-                pos_resp_text,
+                question_prompt,
+                positive_prompt,
                 layer_module,
                 None,
             )
             log_prob_neg_orig = self._get_response_logprob(
                 model,
                 tokenizer,
-                situation,
-                char_name,
-                neg_resp_text,
+                question_prompt,
+                neutral_prompt,
                 layer_module,
                 None,
             )
 
-            # Steered log probabilities
+            # Steered log probabilities (answer tokens only)
             log_prob_pos_steered = self._get_response_logprob(
                 model,
                 tokenizer,
-                situation,
-                char_name,
-                pos_resp_text,
+                question_prompt,
+                positive_prompt,
                 layer_module,
                 d * v,
             )
             log_prob_neg_steered = self._get_response_logprob(
                 model,
                 tokenizer,
-                situation,
-                char_name,
-                neg_resp_text,
+                question_prompt,
+                neutral_prompt,
                 layer_module,
                 d * v,
             )
@@ -435,45 +417,33 @@ class BiPOVectorExtractor(BaseVectorExtractor):
         self,
         model: nn.Module,
         tokenizer: AutoTokenizer,
-        situation: str,
-        char_name: str,
-        response: str,
+        question_prompt: str,
+        full_prompt: str,
         layer_module: nn.Module,
         steering: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """
-        Calculate log probability of response tokens.
-
-        BiPO always uses full text format: P(full_answer | question)
+        Calculate log probability of ANSWER tokens only.
 
         Args:
             model: Language model
             tokenizer: Tokenizer
-            situation: Situation description
-            char_name: Character name
-            response: Full response text
+            question_prompt: Question prompt without answer
+            full_prompt: Complete prompt with question and answer
             layer_module: Target layer
             steering: Steering vector to apply (None for no steering)
 
         Returns:
-            Sum of log probabilities for response tokens
+            Sum of log probabilities for answer tokens only
         """
-        # Build prompt: situation + question + full answer
-        # question_text = f"[Situation]\n{situation}\n[Question]\nYou are {char_name}. What would your response be in this situation?\n[Answer]\n"
-        question_text = f"{situation}"
-
-        # Apply chat template
-        # question_text = self._format_with_chat_template(tokenizer, question_text)
-        full_text = question_text + ' ' + response
-
+        # Tokenize the full prompt
         tokens = tokenizer(  # type: ignore[call-arg]
-            full_text, return_tensors="pt", max_length=512, truncation=True
+            full_prompt, return_tensors="pt", max_length=512, truncation=True
         )
 
-        # Calculate question length to identify response tokens
-        # Use same tokenization method as full_text for consistency
+        # Calculate question length to identify answer token positions
         question_tokens = tokenizer(  # type: ignore[call-arg]
-            question_text, return_tensors="pt", max_length=512, truncation=True
+            question_prompt, return_tensors="pt", max_length=512, truncation=True
         )
         question_len = question_tokens.input_ids.size(1)
 
@@ -506,16 +476,15 @@ class BiPOVectorExtractor(BaseVectorExtractor):
                 with torch.no_grad():
                     logits = model(input_ids).logits
 
-            # Calculate log probabilities for response tokens only
-            # We calculate P(response | question) = P(r_T | q)
-            # For each response token at position i, we use:
+            # Calculate log probabilities for ANSWER tokens only
+            # For each token at position i, we use:
             #   log P(token_i | context_{<i})
             # where context_{<i} includes all tokens up to (but not including) position i
             log_probs = F.log_softmax(logits, dim=-1)
             total_logprob = torch.tensor(0.0, device=input_ids.device)
 
-            # Loop through response token positions only
-            # Start from question_len (first response token position)
+            # Loop through answer token positions only
+            # Start from question_len (first answer token position)
             # End at input_ids.size(1) (total sequence length)
             for i in range(question_len, input_ids.size(1)):
                 current_token = input_ids[0, i]
@@ -528,33 +497,3 @@ class BiPOVectorExtractor(BaseVectorExtractor):
         finally:
             if hook_handle:
                 hook_handle.remove()
-
-    def _format_with_chat_template(self, tokenizer: AutoTokenizer, text: str) -> str:
-        """
-        Format text using model's chat template if available.
-
-        Args:
-            tokenizer: Model tokenizer
-            text: Text to format
-
-        Returns:
-            Formatted text (with chat template if available, otherwise original)
-        """
-        # Try to use chat template if available
-        if hasattr(tokenizer, "apply_chat_template") and tokenizer.chat_template:  # type: ignore[union-attr]
-            try:
-                messages = [{"role": "user", "content": text}]
-                formatted = tokenizer.apply_chat_template(  # type: ignore[call-arg]
-                    messages, tokenize=False, add_generation_prompt=True
-                )
-                self.logger.debug("Applied chat template for prompt formatting")
-                return formatted
-            except Exception as e:
-                self.logger.warning(
-                    f"Failed to apply chat template: {e}. Using raw text."
-                )
-                return text
-        else:
-            # Fallback: return raw text
-            self.logger.debug("No chat template available, using raw text")
-            return text

@@ -16,14 +16,14 @@ logger = get_logger("test_steer_dataset_loader")
 @pytest.fixture
 def tokenizer():
     """Load a test tokenizer."""
-    tokenizer = AutoTokenizer.from_pretrained("google/gemma-2-2b-it")
+    tokenizer = AutoTokenizer.from_pretrained("google/gemma-3-270m-it")
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     return tokenizer
 
 
 @pytest.fixture
-def v3_dataset_file(tmp_path):
+def dataset_file(tmp_path):
     """Create a dataset file."""
     dataset_path = tmp_path / "test_dataset.jsonl"
 
@@ -49,12 +49,12 @@ def v3_dataset_file(tmp_path):
     return dataset_path
 
 
-def test_load_v3_dataset(v3_dataset_file):
+def test_load_dataset(dataset_file):
     """Test loading dataset."""
     logger.info("Testing SteerDatasetLoader.load()")
 
     loader = SteerDatasetLoader()
-    dataset = loader.load(v3_dataset_file)
+    dataset = loader.load(dataset_file)
 
     assert len(dataset) == 2
 
@@ -68,15 +68,15 @@ def test_load_v3_dataset(v3_dataset_file):
     logger.success("Dataset loading test passed")
 
 
-def test_create_prompts_index_format(v3_dataset_file, tokenizer):
+def test_create_prompts_index_format(dataset_file, tokenizer):
     """Test creating prompts with index format (CAA style)."""
     logger.info("Testing create_prompts() with index format")
 
     loader = SteerDatasetLoader()
-    dataset = loader.load(v3_dataset_file)
+    dataset = loader.load(dataset_file)
 
     pos_prompts, neu_prompts = loader.create_prompts(
-        dataset, tokenizer, format_type="index"
+        dataset, tokenizer, format_type="index", use_chat_template=True
     )
 
     assert len(pos_prompts) == 2
@@ -87,19 +87,46 @@ def test_create_prompts_index_format(v3_dataset_file, tokenizer):
     assert "1." in pos_prompts[0]  # Should have choice 1
     assert "2." in pos_prompts[0]  # Should have choice 2
     assert "(1" in pos_prompts[0]  # Should select index 1
+    assert "<bos>" in pos_prompts[0]  # Should have special token <bos>
+    assert "<start_of_turn>model" in pos_prompts[0]  # Should have special token <start_of_turn>model
 
     logger.success("Index format prompt creation test passed")
 
+def test_create_prompts_index_format_without_chat_template(dataset_file, tokenizer):
+    """Test creating prompts with index format (CAA style) without chat template."""
+    logger.info("Testing create_prompts() with index format without chat template")
 
-def test_create_prompts_direct_format(v3_dataset_file, tokenizer):
+    loader = SteerDatasetLoader()
+    dataset = loader.load(dataset_file)
+
+    pos_prompts, neu_prompts = loader.create_prompts(
+        dataset, tokenizer, format_type="index",
+        use_chat_template=False
+    )
+
+    assert len(pos_prompts) == 2
+    assert len(neu_prompts) == 2
+
+    # Check structure - should include both answers with indices
+    assert "[Situation]" in pos_prompts[0] or "Alice meets Bob" in pos_prompts[0]
+    assert "1." in pos_prompts[0]  # Should have choice 1
+    assert "2." in pos_prompts[0]  # Should have choice 2
+    assert "(1" in pos_prompts[0]  # Should select index 1
+    assert "<bos>" not in pos_prompts[0]  # Should have special token <bos>
+    assert "<start_of_turn>model" not in pos_prompts[0]  # Should have special token <start_of_turn>model
+    
+    logger.success("Index format prompt creation test passed")
+
+def test_create_prompts_direct_format(dataset_file, tokenizer):
     """Test creating prompts with direct format (BiPO style)."""
     logger.info("Testing create_prompts() with direct format")
 
     loader = SteerDatasetLoader()
-    dataset = loader.load(v3_dataset_file)
+    dataset = loader.load(dataset_file)
 
     pos_prompts, neu_prompts = loader.create_prompts(
-        dataset, tokenizer, format_type="direct"
+        dataset, tokenizer, format_type="direct", 
+        use_chat_template=True
     )
 
     assert len(pos_prompts) == 2
@@ -116,13 +143,33 @@ def test_create_prompts_direct_format(v3_dataset_file, tokenizer):
 
     logger.success("Direct format prompt creation test passed")
 
+def test_create_prompts_direct_format_without_chat_template(dataset_file, tokenizer):
+    """Test creating prompts with direct format (BiPO style) without chat template."""
+    logger.info("Testing create_prompts() with direct format without chat template")
 
-def test_prompt_format_comparison(v3_dataset_file, tokenizer):
+    loader = SteerDatasetLoader()
+    dataset = loader.load(dataset_file)
+
+    pos_prompts, neu_prompts = loader.create_prompts(
+        dataset, tokenizer, format_type="direct", 
+        use_chat_template=False
+    )
+
+    assert len(pos_prompts) == 2
+    assert len(neu_prompts) == 2
+
+    assert "<bos>" not in pos_prompts[0]  # Should have special token <bos>
+    assert "<start_of_turn>model" not in pos_prompts[0]  # Should have special token <start_of_turn>model
+    
+    logger.success("Direct format prompt creation test without chat template passed")
+
+
+def test_prompt_format_comparison(dataset_file, tokenizer):
     """Test that index and direct formats produce different prompts."""
     logger.info("Testing format comparison")
 
     loader = SteerDatasetLoader()
-    dataset = loader.load(v3_dataset_file)
+    dataset = loader.load(dataset_file)
 
     pos_index, _ = loader.create_prompts(dataset, tokenizer, format_type="index")
     pos_direct, _ = loader.create_prompts(dataset, tokenizer, format_type="direct")
@@ -136,12 +183,12 @@ def test_prompt_format_comparison(v3_dataset_file, tokenizer):
     logger.success("Format comparison test passed")
 
 
-def test_v3_dataset_structure_validation(v3_dataset_file):
+def test_dataset_structure_validation(dataset_file):
     """Test that dataset has correct structure."""
     logger.info("Testing dataset structure validation")
 
     loader = SteerDatasetLoader()
-    dataset = loader.load(v3_dataset_file)
+    dataset = loader.load(dataset_file)
 
     for entry in dataset:
         # Required fields
@@ -162,12 +209,12 @@ def test_v3_dataset_structure_validation(v3_dataset_file):
     logger.success("Structure validation test passed")
 
 
-def test_build_prompt_with_choices(v3_dataset_file, tokenizer):
+def test_build_prompt_with_choices(dataset_file, tokenizer):
     """Test _build_prompt_with_choices method."""
     logger.info("Testing _build_prompt_with_choices()")
 
     loader = SteerDatasetLoader()
-    dataset = loader.load(v3_dataset_file)
+    dataset = loader.load(dataset_file)
 
     sample = dataset[0]
     prompt = loader._build_prompt_with_choices(
@@ -188,12 +235,12 @@ def test_build_prompt_with_choices(v3_dataset_file, tokenizer):
     logger.success("_build_prompt_with_choices test passed")
 
 
-def test_build_prompt_direct(v3_dataset_file, tokenizer):
+def test_build_prompt_direct(dataset_file, tokenizer):
     """Test _build_prompt_direct method."""
     logger.info("Testing _build_prompt_direct()")
 
     loader = SteerDatasetLoader()
-    dataset = loader.load(v3_dataset_file)
+    dataset = loader.load(dataset_file)
 
     sample = dataset[0]
     prompt = loader._build_prompt_direct(

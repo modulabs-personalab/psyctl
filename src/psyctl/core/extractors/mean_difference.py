@@ -53,6 +53,7 @@ class MeanDifferenceActivationVectorExtractor(BaseVectorExtractor):
         dataset: list[dict] | None = None,
         batch_size: int | None = None,
         normalize: bool = False,
+        use_chat_template: bool = True,
         **kwargs,
     ) -> dict[str, torch.Tensor]:
         """
@@ -66,6 +67,7 @@ class MeanDifferenceActivationVectorExtractor(BaseVectorExtractor):
             dataset: Pre-loaded dataset as list of dicts (optional if dataset_path provided)
             batch_size: Batch size for inference (default: from config)
             normalize: Whether to normalize vectors to unit length
+            use_chat_template: Whether to use chat template for prompt formatting (default: True)
             **kwargs: Additional parameters (unused)
 
         Returns:
@@ -113,6 +115,7 @@ class MeanDifferenceActivationVectorExtractor(BaseVectorExtractor):
         self.logger.info(f"Dataset: {'pre-loaded' if dataset else dataset_path}")
         self.logger.info(f"Batch size: {batch_size}")
         self.logger.info(f"Normalize: {normalize}")
+        self.logger.info(f"Use chat template: {use_chat_template}")
 
         # 1. Validate layers
         self.logger.info("Validating layer paths...")
@@ -127,7 +130,7 @@ class MeanDifferenceActivationVectorExtractor(BaseVectorExtractor):
             self.logger.info("Using pre-loaded dataset...")
 
         positive_prompts, neutral_prompts = self.dataset_loader.create_prompts(
-            dataset, tokenizer
+            dataset, tokenizer, format_type="index", use_chat_template=use_chat_template
         )
 
         self.logger.info(
