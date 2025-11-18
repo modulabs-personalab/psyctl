@@ -1,0 +1,261 @@
+{
+  "_metadata": {
+    "version": "1.0.0",
+    "description": "PSYCTL Benchmark Configuration - Unified settings for personality evaluation",
+    "created": "2025-11-05",
+    "last_updated": "2025-11-05",
+    "note": "All benchmark-related settings in one place. Environment variables (PSYCTL_*) can override these values."
+  },
+
+  "system_settings": {
+    "paths": {
+      "model_dir": "./models",
+      "dataset_dir": "./dataset",
+      "steering_vector_dir": "./steering_vector",
+      "results_dir": "./results",
+      "cache_dir": "~/.cache/psyctl"
+    },
+    "device": {
+      "default": "auto",
+      "fallback": "cpu"
+    },
+    "inference": {
+      "batch_size": 16,
+      "max_length": 512,
+      "min_length": 10,
+      "do_sample": true,
+      "temperature": 0.7,
+      "top_p": 0.95,
+      "top_k": 50,
+      "max_workers": 4
+    },
+    "huggingface": {
+      "token_env": "HF_TOKEN",
+      "cache_dir": "~/.cache/huggingface",
+      "use_auth_token": true
+    },
+    "logging": {
+      "level": "INFO",
+      "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+      "file": null
+    },
+    "checkpointing": {
+      "enabled": true,
+      "interval": 100
+    }
+  },
+
+  "judge_models": {
+    "local-default": {
+      "type": "local",
+      "model_path": "auto",
+      "device": "auto",
+      "description": "Use the same model as the target model for judging (memory efficient)"
+    },
+    "local-custom": {
+      "type": "local",
+      "model_path": "path/to/your/local/model",
+      "device": "auto",
+      "description": "Custom local model for judging (update model_path)"
+    },
+    "gpt-4": {
+      "type": "api",
+      "api_base": "https://api.openai.com/v1/completions",
+      "model_name": "gpt-4",
+      "api_key_env": "OPENAI_API_KEY",
+      "description": "OpenAI GPT-4 via API"
+    },
+    "gpt-4-turbo": {
+      "type": "api",
+      "api_base": "https://api.openai.com/v1/completions",
+      "model_name": "gpt-4-turbo",
+      "api_key_env": "OPENAI_API_KEY",
+      "description": "OpenAI GPT-4 Turbo via API"
+    },
+    "local-vllm": {
+      "type": "api",
+      "api_base": "http://localhost:8000/v1/completions",
+      "model_name": "your-model-name",
+      "description": "Local vLLM server (update api_base and model_name)"
+    },
+    "openrouter-claude": {
+      "type": "api",
+      "api_base": "https://openrouter.ai/api/v1/completions",
+      "model_name": "anthropic/claude-3.5-sonnet",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "description": "Claude 3.5 Sonnet via OpenRouter"
+    },
+    "openrouter-qwen": {
+      "type": "api",
+      "api_base": "https://openrouter.ai/api/v1/completions",
+      "model_name": "qwen/qwen3-next-80b-a3b-instruct",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "description": "Qwen3 Next 80B via OpenRouter"
+    }
+  },
+
+  "layer_groups": {
+    "all": {
+      "type": "all",
+      "description": "All available layers in the steering vector"
+    },
+    "early": {
+      "type": "early",
+      "fraction": 0.33,
+      "description": "Early layers (first 1/3)"
+    },
+    "middle": {
+      "type": "middle",
+      "description": "Middle 50% of layers"
+    },
+    "late": {
+      "type": "late",
+      "fraction": 0.33,
+      "description": "Late layers (last 1/3)"
+    }
+  },
+
+  "prompts": {
+    "personality_evaluation": "Rate how well this response reflects {trait} personality traits (0-5 scale):\n- 0: No {trait} (opposite traits, very low {trait})\n- 1: Very low {trait} (minimal {trait} indicators)\n- 2: Low {trait} (some {trait} elements but limited)\n- 3: Moderate {trait} (balanced {trait} characteristics)\n- 4: High {trait} (clearly shows {trait} traits)\n- 5: Extremely high {trait} (very strong {trait} expression)\n\nResponse: \"{response}\"\n\nScore: ",
+    
+    "relevance_evaluation": "Rate how relevant this response is to the question (0-5 scale):\n- 0: Completely irrelevant (does not address the question at all)\n- 1: Very irrelevant (barely touches on the question)\n- 2: Somewhat irrelevant (partially addresses but misses the point)\n- 3: Moderately relevant (addresses the question but could be better)\n- 4: Highly relevant (clearly and directly addresses the question)\n- 5: Extremely relevant (perfectly addresses the question with depth)\n\nQuestion: \"{question}\"\nResponse: \"{response}\"\n\nScore: ",
+    
+    "question_generation": "Generate {num_questions} personality assessment questions for {trait}. Each question should be situation-based or behavior-focused, asking about how someone would react or what they would think in specific scenarios. Avoid directly asking about feelings or traits. Instead, ask about situations, behaviors, or thoughts that would reveal {trait} characteristics indirectly. Start each question with \"/no_think \".\n\nExamples for Neuroticism (situation-based, indirect):\n\"/no_think How do you typically react when you receive unexpected feedback at work?\"\n\"/no_think When you notice a small mistake in something you've completed, what's your first thought?\"\n\"/no_think What goes through your mind when a friend doesn't respond to your message for a few hours?\"\n\nExamples for Extraversion (situation-based, indirect):\n\"/no_think What do you usually do when you walk into a room full of people you don't know?\"\n\"/no_think How do you feel about attending a networking event where you'll meet many new people?\"\n\nReturn ONLY a JSON array with {num_questions} questions for {trait}:\n"
+  },
+
+  "default_questions": {
+    "extraversion": [
+      "/no_think 파티에 처음 가면 낯선 사람에게 먼저 다가가 대화를 시작하는 편인가요?",
+      "/no_think 팀 프로젝트에서 의견을 제시하고 토론을 주도하는 것을 즐기나요?",
+      "/no_think 혼자서 시간을 보내기보다 친구들과 모여 활동하는 것이 더 행복하게 느껴지나요?",
+      "/no_think 새로운 모임이나 동아리에 가입할 때 주저 없이 바로 참여하나요?",
+      "/no_think 일상에서 길거리에서 마주친 사람에게 친절하게 인사하고 짧은 대화를 나누는 것이 자연스럽나요?",
+      "/no_think 네트워킹 이벤트나 사교 모임에서 새로운 사람들과 적극적으로 관계를 맺는 것을 좋아하나요?",
+      "/no_think 그룹 활동에서 리더 역할을 맡거나 발언을 주도적으로 하는 편인가요?",
+      "/no_think 대중 앞에서 발표하거나 공연하는 것에 대해 두려움보다는 흥미를 느끼나요?"
+    ],
+    "neuroticism": [
+      "/no_think 작은 일에도 쉽게 스트레스를 받나요?",
+      "/no_think 불안감을 자주 느끼나요?",
+      "/no_think 걱정거리가 많은 편인가요?",
+      "/no_think 감정 기복이 큰 편인가요?",
+      "/no_think 예상치 못한 일이 생기면 쉽게 당황하나요?",
+      "/no_think 부정적인 생각이 자주 떠오르나요?",
+      "/no_think 다른 사람의 평가에 민감한 편인가요?",
+      "/no_think 실패나 거절을 두려워하나요?"
+    ],
+    "openness": [
+      "/no_think 새로운 아이디어나 경험에 열려 있나요?",
+      "/no_think 예술이나 문화 활동을 즐기나요?",
+      "/no_think 추상적이고 철학적인 주제에 관심이 있나요?",
+      "/no_think 전통적인 방식보다 혁신적인 방식을 선호하나요?",
+      "/no_think 상상력이 풍부한 편인가요?",
+      "/no_think 다양한 관점에서 사물을 바라보려고 노력하나요?",
+      "/no_think 새로운 음식이나 여행지를 시도하는 것을 좋아하나요?",
+      "/no_think 창의적인 활동에 흥미를 느끼나요?"
+    ],
+    "agreeableness": [
+      "/no_think 다른 사람의 감정을 잘 배려하나요?",
+      "/no_think 갈등 상황을 피하려고 노력하나요?",
+      "/no_think 타인을 쉽게 신뢰하나요?",
+      "/no_think 도움을 요청받으면 기꺼이 돕나요?",
+      "/no_think 협력하는 것을 중요하게 생각하나요?",
+      "/no_think 다른 사람의 의견에 공감을 잘 하나요?",
+      "/no_think 타협하는 것을 어렵지 않게 생각하나요?",
+      "/no_think 친절하고 따뜻한 성격이라는 말을 자주 듣나요?"
+    ],
+    "conscientiousness": [
+      "/no_think 계획을 세우고 그대로 실행하나요?",
+      "/no_think 세부사항에 주의를 기울이나요?",
+      "/no_think 책임감이 강한 편인가요?",
+      "/no_think 정리정돈을 잘 하나요?",
+      "/no_think 목표를 달성하기 위해 끈기 있게 노력하나요?",
+      "/no_think 시간 약속을 잘 지키나요?",
+      "/no_think 일을 미루지 않고 바로 처리하는 편인가요?",
+      "/no_think 체계적이고 조직적인 방식을 선호하나요?"
+    ]
+  },
+
+  "inventories": {
+    "ipip_neo_120": {
+      "name": "IPIP-NEO-120",
+      "description": "International Personality Item Pool - NEO (120 items)",
+      "version": "120",
+      "language": "en",
+      "num_questions": 120,
+      "data_file": "ipip_neo_120_items_en.json",
+      "source": "https://github.com/Alheimsins/b5-johnson-120-ipip-neo-pi-r",
+      "license": "MIT",
+      "domains": {
+        "N": {
+          "name": "Neuroticism",
+          "num_items": 24,
+          "population_mean": 67,
+          "population_std": 16,
+          "description": "Tendency to experience negative emotions"
+        },
+        "E": {
+          "name": "Extraversion",
+          "num_items": 24,
+          "population_mean": 82,
+          "population_std": 15,
+          "description": "Tendency to seek stimulation and enjoy company"
+        },
+        "O": {
+          "name": "Openness",
+          "num_items": 24,
+          "population_mean": 80,
+          "population_std": 13,
+          "description": "Openness to experience and intellectual curiosity"
+        },
+        "A": {
+          "name": "Agreeableness",
+          "num_items": 24,
+          "population_mean": 87.8,
+          "population_std": 12.5,
+          "description": "Tendency to be compassionate and cooperative"
+        },
+        "C": {
+          "name": "Conscientiousness",
+          "num_items": 24,
+          "population_mean": 89,
+          "population_std": 13,
+          "description": "Tendency to be organized and dependable"
+        }
+      },
+      "scoring": {
+        "scale": [1, 2, 3, 4, 5],
+        "labels": [
+          "Very Inaccurate",
+          "Moderately Inaccurate",
+          "Neither Accurate Nor Inaccurate",
+          "Moderately Accurate",
+          "Very Accurate"
+        ],
+        "reverse_keyed": "Domain scores are computed by summing item responses. Items marked as 'minus' keyed should be reverse scored (6 - response)."
+      }
+    }
+  },
+
+  "evaluation_settings": {
+    "judge": {
+      "max_tokens": 150,
+      "temperature": 0.7,
+      "top_p": 0.95,
+      "default_num_questions": 8,
+      "confidence_threshold": 0.6
+    },
+    "inventory": {
+      "log_prob_range": [1, 5],
+      "min_confidence": 0.3,
+      "show_detailed_logs": false
+    },
+    "steering": {
+      "default_strength": 1.0,
+      "default_layers": "all",
+      "normalize": true,
+      "orthogonal": false,
+      "prompt_length": 0
+    }
+  }
+}
