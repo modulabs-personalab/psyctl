@@ -334,6 +334,7 @@ class SteeringApplier:
         strength: float | dict[str, float] = 1.0,
         prompt_length: int = 0,
         orthogonal: bool = False,
+        layers: list[str] | None = None,
     ) -> tuple[nn.Module, AutoTokenizer]:
         """
         Apply steering vector hooks to model and return steered model.
@@ -352,6 +353,7 @@ class SteeringApplier:
                 - Dict[str, float]: Per-layer strength mapping. Missing layers default to 1.0
             prompt_length: Length of prompt in tokens (0 = apply to all tokens)
             orthogonal: Use orthogonalized addition method
+            layers: List of layer names to apply steering. Uses all available layers if None.
 
         Returns:
             Tuple of (model, tokenizer) where model has remove_steering() method
@@ -422,6 +424,30 @@ class SteeringApplier:
             # 2. Load steering vectors and metadata
             self.logger.info("Loading steering vectors...")
             vectors, metadata = self.vector_store.load_multi_layer(steering_vector_path)
+            
+            # 2.5. Filter layers if specified
+            if layers is not None:
+                original_count = len(vectors)
+                available_layers = list(vectors.keys())
+                vectors = {k: v for k, v in vectors.items() if k in layers}
+                filtered_count = len(vectors)
+                
+                if filtered_count == 0:
+                    raise ValueError(
+                        f"None of the specified layers found in steering vector. "
+                        f"Specified: {layers}, Available: {available_layers}"
+                    )
+                
+                if filtered_count < len(layers):
+                    missing = set(layers) - set(available_layers)
+                    self.logger.warning(
+                        f"Some specified layers not found: {missing}. "
+                        f"Using {filtered_count}/{len(layers)} layers."
+                    )
+                
+                self.logger.info(
+                    f"Filtered to {filtered_count}/{original_count} layers"
+                )
 
             # 3. Register hooks for each layer
             self.logger.info(f"Registering hooks for {len(vectors)} layers...")
