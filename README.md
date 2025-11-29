@@ -212,12 +212,13 @@ Contributions are welcome! See [Contributing Guide](./docs/CONTRIBUTING.md) for:
 ---
 
 ## Sponsors
-This project is sponsored by [Caveduck.io](https://caveduck.io)
-
 
 <p align="left">
   <a href="https://caveduck.io" target="_blank">
     <img src="https://cdn.caveduck.io/public/assets/logo_white.c2efa9b1d010.svg" alt="Caveduck.io" width="200"/>
+  </a>
+  <a href="https://modulabs.co.kr/" target="_blank" style="margin-left:20px">
+    <img src="https://i.namu.wiki/i/OqOsAbn-fFDwzMVNG3EsqTEMZz13k7wmahhZwkayuE1q9WWWLtMMmaqCM9FJULqHB1CjRGHiQzVoOHkQFQkbHBbNlF9CfB1_yEMVgZWOHnbyHdB-akqxFIOjQ9WXGM7RJF4H0JUGGzxDQxIGXeGtTg.webp" alt="Caveduck.io" width="200"/>
   </a>
 </p>
 
