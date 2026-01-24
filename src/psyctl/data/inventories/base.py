@@ -139,4 +139,3 @@ class BaseInventory(ABC):
             Path to config JSON file
         """
         return Path(__file__).parent.parent / "benchmark_config.json"
-

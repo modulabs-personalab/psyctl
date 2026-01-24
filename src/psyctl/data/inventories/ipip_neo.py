@@ -7,8 +7,10 @@ from pathlib import Path
 from typing import Any
 
 from .base import BaseInventory
+from .registry import register_inventory
 
 
+@register_inventory("ipip_neo")
 class IPIPNEO(BaseInventory):
     """IPIP-NEO (International Personality Item Pool - NEO) inventory."""
 
@@ -27,11 +29,14 @@ class IPIPNEO(BaseInventory):
     def _load_config(self) -> dict[str, Any]:
         """Load inventory configuration."""
         config_path = Path(__file__).parent.parent / "benchmark_config.json"
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(config_path, encoding="utf-8") as f:
             all_configs = json.load(f)
 
         inventory_key = f"ipip_neo_{self.version}"
-        if "inventories" not in all_configs or inventory_key not in all_configs["inventories"]:
+        if (
+            "inventories" not in all_configs
+            or inventory_key not in all_configs["inventories"]
+        ):
             raise ValueError(f"Inventory version '{self.version}' not found in config")
 
         return all_configs["inventories"][inventory_key]
@@ -41,7 +46,7 @@ class IPIPNEO(BaseInventory):
         data_file = self.config["data_file"]
         data_path = Path(__file__).parent / data_file
 
-        with open(data_path, "r", encoding="utf-8") as f:
+        with open(data_path, encoding="utf-8") as f:
             questions = json.load(f)
 
         return questions
@@ -165,7 +170,6 @@ class IPIPNEO(BaseInventory):
         """
         # Approximation of cumulative distribution function
         # Using the error function approximation
-        import math
 
         # Simple approximation: percentile ≈ 50 + 34.13 * z for |z| < 3
         if abs(z_score) < 3:

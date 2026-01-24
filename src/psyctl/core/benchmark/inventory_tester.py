@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -10,10 +9,10 @@ import torch
 from tqdm import tqdm
 
 from psyctl.core.benchmark.layer_resolver import LayerResolver
-from psyctl.core.logger import get_logger
 from psyctl.core.benchmark.logprob_scorer import LogProbScorer
+from psyctl.core.logger import get_logger
 from psyctl.core.steering_applier import SteeringApplier
-from psyctl.data.inventories.ipip_neo import IPIPNEO
+from psyctl.data.inventories import BaseInventory, create_inventory
 from psyctl.models.llm_loader import LLMLoader
 from psyctl.models.vector_store import VectorStore
 
@@ -26,9 +25,10 @@ class InventoryTester:
         self.loader = LLMLoader()
         self.vector_store = VectorStore()
         self.applier = SteeringApplier()
-        
+
         # Load layer groups configuration
         from psyctl.data import benchmark_settings
+
         try:
             self.layer_groups_config = benchmark_settings.get_layer_groups()
         except Exception as e:
@@ -83,9 +83,8 @@ class InventoryTester:
 
             # 2. Load inventory and questions
             self.logger.info(f"Loading inventory: {inventory_name}")
-            version = inventory_name.split("_")[-1] if "_" in inventory_name else "120"
-            inventory = IPIPNEO(version=version)
-            
+            inventory = create_inventory(inventory_name)
+
             # Get questions (filtered by trait if specified)
             questions = inventory.get_questions(trait=target_trait)
             if target_trait:
@@ -112,13 +111,13 @@ class InventoryTester:
                     raise FileNotFoundError(
                         f"Steering vector file does not exist: {steering_vector_path}"
                     )
-                
+
                 # Load steering vectors to get available layers
                 steering_vectors, metadata = self.vector_store.load_multi_layer(
                     steering_vector_path
                 )
                 available_layers = list(steering_vectors.keys())
-                
+
                 # Resolve layer specification
                 if layer_spec:
                     resolved_layers = LayerResolver.resolve_layer_spec(
@@ -131,7 +130,7 @@ class InventoryTester:
                         f"Resolved layer spec '{layer_desc}' to {len(resolved_layers)} layers: "
                         f"{[LayerResolver._extract_layer_number(l) for l in resolved_layers]}"
                     )
-                
+
                 self.logger.info("Applying steering hooks to model...")
                 # Use existing apply method with prompt_length=0 for all tokens
                 model_obj, tokenizer = self.applier.get_steering_applied_model(
@@ -144,7 +143,7 @@ class InventoryTester:
                     layers=resolved_layers,  # Filter to specific layers if provided
                 )
                 self.logger.info("Steering hooks applied successfully")
-                
+
                 # Evaluate with steering
                 self.logger.info("Evaluating steered responses...")
                 steered_responses = self._evaluate_questions(
@@ -153,7 +152,7 @@ class InventoryTester:
                 steered_scores = self._calculate_domain_scores(
                     steered_responses, inventory
                 )
-                
+
                 # Clean up steering hooks
                 if hasattr(model_obj, "remove_steering"):
                     model_obj.remove_steering()  # type: ignore[attr-defined]
@@ -163,10 +162,16 @@ class InventoryTester:
             results = {
                 "model": model,
                 "inventory": inventory_name,
-                "steering_vector": str(steering_vector_path) if steering_vector_path else None,
+                "steering_vector": str(steering_vector_path)
+                if steering_vector_path
+                else None,
                 "steering_strength": steering_strength,
                 "layer_spec": layer_spec,
-                "resolved_layers": [LayerResolver._extract_layer_number(l) for l in resolved_layers] if resolved_layers else None,
+                "resolved_layers": [
+                    LayerResolver._extract_layer_number(l) for l in resolved_layers
+                ]
+                if resolved_layers
+                else None,
                 "baseline": baseline_scores,
                 "steered": steered_scores,
                 "comparison": self._compare_scores(baseline_scores, steered_scores)
@@ -264,9 +269,7 @@ Your rating (1-5):"""
         logits = outputs.logits[0, -1, :]  # (vocab_size,)
 
         # Calculate weighted score
-        weighted_score, confidence = self._calculate_weighted_score(
-            logits, tokenizer
-        )
+        weighted_score, confidence = self._calculate_weighted_score(logits, tokenizer)
 
         return weighted_score, confidence
 
@@ -290,7 +293,7 @@ Your rating (1-5):"""
         )
 
     def _calculate_domain_scores(
-        self, domain_responses: dict[str, list[float]], inventory: IPIPNEO
+        self, domain_responses: dict[str, list[float]], inventory: BaseInventory
     ) -> dict[str, dict[str, float]]:
         """
         Calculate domain scores from responses.
@@ -326,9 +329,7 @@ Your rating (1-5):"""
                 baseline_raw = baseline[domain]["raw_score"]
                 steered_raw = steered[domain]["raw_score"]
                 change = steered_raw - baseline_raw
-                pct_change = (
-                    (change / baseline_raw) * 100 if baseline_raw != 0 else 0.0
-                )
+                pct_change = (change / baseline_raw) * 100 if baseline_raw != 0 else 0.0
 
                 comparison[domain] = {
                     "domain_name": baseline[domain]["domain_name"],
@@ -343,4 +344,3 @@ Your rating (1-5):"""
                 }
 
         return comparison
-
