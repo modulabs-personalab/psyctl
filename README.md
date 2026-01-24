@@ -221,6 +221,7 @@ Try psyctl directly in your browser with these Colab notebooks:
 | Notebook | Description |
 |----------|-------------|
 | [Steering Gemma-3-4b-it With PsyCtl](https://colab.research.google.com/drive/1h84G02UYAgJ_GSm_1mhnerpK_HhMzO46) | End-to-end steering workflow: layer analysis, BiPO extraction, and text generation |
+| [PsyCtl로 Gemma-3-4b-it 성격 조향하기 (Korean)](https://colab.research.google.com/drive/12x92LqwshlDlxH9xn1JkeZTK7JkdTvzJ) | Same workflow in Korean |
 | [Steering Gemma-3-270m-it With PsyCtl](https://colab.research.google.com/drive/1TJCXjwuYd_IRghpg-uKQc1T4eDNkKdrl) | Lightweight version using 270M model for quick testing |
 | [CAA Extraction (Incremental Mean)](https://colab.research.google.com/drive/1uAFDbxjUXJKuH8CbdDZtGki74aFNajxz) | Manual CAA vector extraction with memory-efficient incremental mean |
 | [BiPO PoC](https://colab.research.google.com/drive/1mK5_VXb8AWX9NzOe93BRSUJDoRbQWh5y) | BiPO algorithm proof-of-concept with distilgpt2 |
