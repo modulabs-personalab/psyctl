@@ -156,3 +156,4 @@ nul
 result
 scripts/generate-rudeness-ko-1000.ps1
 scripts/upload-latest-rudeness-ko.ps1
+google-service-account-credential.json
