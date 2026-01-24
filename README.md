@@ -214,6 +214,22 @@ psyctl benchmark llm-as-judge \
 
 ---
 
+## PoC Notebooks (Google Colab)
+
+Try psyctl directly in your browser with these Colab notebooks:
+
+| Notebook | Description |
+|----------|-------------|
+| [Steering Gemma-3-4b-it With PsyCtl](https://colab.research.google.com/drive/1h84G02UYAgJ_GSm_1mhnerpK_HhMzO46) | End-to-end steering workflow: layer analysis, BiPO extraction, and text generation |
+| [Steering Gemma-3-270m-it With PsyCtl](https://colab.research.google.com/drive/1TJCXjwuYd_IRghpg-uKQc1T4eDNkKdrl) | Lightweight version using 270M model for quick testing |
+| [CAA Extraction (Incremental Mean)](https://colab.research.google.com/drive/1uAFDbxjUXJKuH8CbdDZtGki74aFNajxz) | Manual CAA vector extraction with memory-efficient incremental mean |
+| [BiPO PoC](https://colab.research.google.com/drive/1mK5_VXb8AWX9NzOe93BRSUJDoRbQWh5y) | BiPO algorithm proof-of-concept with distilgpt2 |
+| [Build CAA Dataset by P2](https://colab.research.google.com/drive/1AG2sqixvNTZWKCGYqEquPRhPCreA3hdo) | Dataset generation using P2 personality prompting |
+
+> **Note**: These notebooks require a HuggingFace token (set as `HF_TOKEN` in Colab secrets). GPU runtime (T4 or higher) is recommended.
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! See [Contributing Guide](./docs/CONTRIBUTING.md) for:
