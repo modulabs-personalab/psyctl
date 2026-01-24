@@ -8,10 +8,12 @@ from .registry import (
     get_available_inventories,
     get_registry_info,
 )
+from .rei import REI
 
 __all__ = [
     "INVENTORY_REGISTRY",
     "IPIPNEO",
+    "REI",
     "BaseInventory",
     "create_inventory",
     "get_available_inventories",

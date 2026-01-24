@@ -1,0 +1,602 @@
+[
+  {
+    "id": "rei-001",
+    "text": "I try to avoid situations that require thinking in depth about something.",
+    "keyed": "minus",
+    "domain": "RE",
+    "facet": null,
+    "num": 1,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-002",
+    "text": "I enjoy intellectual challenges.",
+    "keyed": "plus",
+    "domain": "RE",
+    "facet": null,
+    "num": 2,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-003",
+    "text": "I don't like to have to do a lot of thinking.",
+    "keyed": "minus",
+    "domain": "RE",
+    "facet": null,
+    "num": 3,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-004",
+    "text": "I enjoy solving problems that require hard thinking.",
+    "keyed": "plus",
+    "domain": "RE",
+    "facet": null,
+    "num": 4,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-005",
+    "text": "Thinking is not my idea of an enjoyable activity.",
+    "keyed": "minus",
+    "domain": "RE",
+    "facet": null,
+    "num": 5,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-006",
+    "text": "I prefer complex problems to simple problems.",
+    "keyed": "plus",
+    "domain": "RE",
+    "facet": null,
+    "num": 6,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-007",
+    "text": "Thinking hard and for a long time about something gives me little satisfaction.",
+    "keyed": "minus",
+    "domain": "RE",
+    "facet": null,
+    "num": 7,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-008",
+    "text": "I enjoy thinking in abstract terms.",
+    "keyed": "plus",
+    "domain": "RE",
+    "facet": null,
+    "num": 8,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-009",
+    "text": "Knowing the answer without having to understand the reasoning behind it is good enough for me.",
+    "keyed": "minus",
+    "domain": "RE",
+    "facet": null,
+    "num": 9,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-010",
+    "text": "Learning new ways to think would be very appealing to me.",
+    "keyed": "plus",
+    "domain": "RE",
+    "facet": null,
+    "num": 10,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-011",
+    "text": "I'm not that good at figuring out complicated problems.",
+    "keyed": "minus",
+    "domain": "RA",
+    "facet": null,
+    "num": 11,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-012",
+    "text": "I am not very good at solving problems that require careful logical analysis.",
+    "keyed": "minus",
+    "domain": "RA",
+    "facet": null,
+    "num": 12,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-013",
+    "text": "I am not a very analytical thinker.",
+    "keyed": "minus",
+    "domain": "RA",
+    "facet": null,
+    "num": 13,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-014",
+    "text": "Reasoning things out carefully is not one of my strong points.",
+    "keyed": "minus",
+    "domain": "RA",
+    "facet": null,
+    "num": 14,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-015",
+    "text": "I don't reason well under pressure.",
+    "keyed": "minus",
+    "domain": "RA",
+    "facet": null,
+    "num": 15,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-016",
+    "text": "I am much better at figuring things out logically than most people.",
+    "keyed": "plus",
+    "domain": "RA",
+    "facet": null,
+    "num": 16,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-017",
+    "text": "I have a logical mind.",
+    "keyed": "plus",
+    "domain": "RA",
+    "facet": null,
+    "num": 17,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-018",
+    "text": "I have no problem thinking things through carefully.",
+    "keyed": "plus",
+    "domain": "RA",
+    "facet": null,
+    "num": 18,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-019",
+    "text": "Using logic usually works well for me in figuring out problems in my life.",
+    "keyed": "plus",
+    "domain": "RA",
+    "facet": null,
+    "num": 19,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-020",
+    "text": "I usually have clear, explainable reasons for my decisions.",
+    "keyed": "plus",
+    "domain": "RA",
+    "facet": null,
+    "num": 20,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-021",
+    "text": "I like to rely on my intuitive impressions.",
+    "keyed": "plus",
+    "domain": "EE",
+    "facet": null,
+    "num": 21,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-022",
+    "text": "Intuition can be a very useful way to solve problems.",
+    "keyed": "plus",
+    "domain": "EE",
+    "facet": null,
+    "num": 22,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-023",
+    "text": "I often go by my instincts when deciding on a course of action.",
+    "keyed": "plus",
+    "domain": "EE",
+    "facet": null,
+    "num": 23,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-024",
+    "text": "I don't like situations in which I have to rely on intuition.",
+    "keyed": "minus",
+    "domain": "EE",
+    "facet": null,
+    "num": 24,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-025",
+    "text": "I think there are times when one should rely on one's intuition.",
+    "keyed": "plus",
+    "domain": "EE",
+    "facet": null,
+    "num": 25,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-026",
+    "text": "I think it is foolish to make important decisions based on feelings.",
+    "keyed": "minus",
+    "domain": "EE",
+    "facet": null,
+    "num": 26,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-027",
+    "text": "I don't think it is a good idea to rely on one's intuition for important decisions.",
+    "keyed": "minus",
+    "domain": "EE",
+    "facet": null,
+    "num": 27,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-028",
+    "text": "I generally don't depend on my feelings to help me make decisions.",
+    "keyed": "minus",
+    "domain": "EE",
+    "facet": null,
+    "num": 28,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-029",
+    "text": "I would not want to depend on anyone who described himself or herself as intuitive.",
+    "keyed": "minus",
+    "domain": "EE",
+    "facet": null,
+    "num": 29,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-030",
+    "text": "I tend to use my heart as a guide for my actions.",
+    "keyed": "plus",
+    "domain": "EE",
+    "facet": null,
+    "num": 30,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-031",
+    "text": "I don't have a very good sense of intuition.",
+    "keyed": "minus",
+    "domain": "EA",
+    "facet": null,
+    "num": 31,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-032",
+    "text": "Using my gut feelings usually works well for me in figuring out problems in my life.",
+    "keyed": "plus",
+    "domain": "EA",
+    "facet": null,
+    "num": 32,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-033",
+    "text": "I believe in trusting my hunches.",
+    "keyed": "plus",
+    "domain": "EA",
+    "facet": null,
+    "num": 33,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-034",
+    "text": "I trust my initial feelings about people.",
+    "keyed": "plus",
+    "domain": "EA",
+    "facet": null,
+    "num": 34,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-035",
+    "text": "When it comes to trusting people, I can usually rely on my gut feelings.",
+    "keyed": "plus",
+    "domain": "EA",
+    "facet": null,
+    "num": 35,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-036",
+    "text": "If I were to rely on my gut feelings, I would often make mistakes.",
+    "keyed": "minus",
+    "domain": "EA",
+    "facet": null,
+    "num": 36,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-037",
+    "text": "I hardly ever go wrong when I listen to my deepest gut feelings to find an answer.",
+    "keyed": "plus",
+    "domain": "EA",
+    "facet": null,
+    "num": 37,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-038",
+    "text": "I can usually feel when a person is right or wrong, even if I can't explain how I know.",
+    "keyed": "plus",
+    "domain": "EA",
+    "facet": null,
+    "num": 38,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-039",
+    "text": "My initial impressions of people are almost always right.",
+    "keyed": "plus",
+    "domain": "EA",
+    "facet": null,
+    "num": 39,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  },
+  {
+    "id": "rei-040",
+    "text": "I suspect my hunches are inaccurate as often as they are accurate.",
+    "keyed": "minus",
+    "domain": "EA",
+    "facet": null,
+    "num": 40,
+    "choices": [
+      {"text": "Definitely not true of myself", "score": 1},
+      {"text": "Somewhat not true of myself", "score": 2},
+      {"text": "Neither true nor untrue of myself", "score": 3},
+      {"text": "Somewhat true of myself", "score": 4},
+      {"text": "Definitely true of myself", "score": 5}
+    ]
+  }
+]
