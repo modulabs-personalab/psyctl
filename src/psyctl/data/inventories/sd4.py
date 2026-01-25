@@ -37,7 +37,7 @@ class SD4(BaseInventory):
             "inventories" not in all_configs
             or inventory_key not in all_configs["inventories"]
         ):
-            raise ValueError(f"SD4 inventory not found in config")
+            raise ValueError("SD4 inventory not found in config")
 
         return all_configs["inventories"][inventory_key]
 
