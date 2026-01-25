@@ -9,11 +9,13 @@ from .registry import (
     get_registry_info,
 )
 from .rei import REI
+from .sd4 import SD4
 
 __all__ = [
     "INVENTORY_REGISTRY",
     "IPIPNEO",
     "REI",
+    "SD4",
     "BaseInventory",
     "create_inventory",
     "get_available_inventories",
