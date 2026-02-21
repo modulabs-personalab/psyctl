@@ -299,6 +299,59 @@
         ],
         "reverse_keyed": "Items marked as 'minus' keyed are reverse scored (6 - response). Higher scores indicate stronger tendency."
       }
+    },
+    "indcolen_1": {
+      "name": "INDCOL-32",
+      "description": "Individualism and Collectivism Scale (32 items)",
+      "version": "1",
+      "language": "en",
+      "num_questions": 32,
+      "data_file": "indcolen_32_items_en.json",
+      "source": "Singelis et al. (1995); https://psytests.org/group/indcolen_1.html",
+      "license": "Unknown",
+      "domains": {
+        "HI": {
+          "name": "Horizontal Individualism",
+          "num_items": 8,
+          "population_mean": 32.0,
+          "population_std": 7.0,
+          "description": "Preference for autonomy with an equality orientation"
+        },
+        "VI": {
+          "name": "Vertical Individualism",
+          "num_items": 8,
+          "population_mean": 32.0,
+          "population_std": 7.0,
+          "description": "Preference for competition and hierarchy in personal achievement"
+        },
+        "HC": {
+          "name": "Horizontal Collectivism",
+          "num_items": 8,
+          "population_mean": 32.0,
+          "population_std": 7.0,
+          "description": "Interdependence and sociability among equals"
+        },
+        "VC": {
+          "name": "Vertical Collectivism",
+          "num_items": 8,
+          "population_mean": 32.0,
+          "population_std": 7.0,
+          "description": "In-group duty and deference to authority/hierarchy"
+        }
+      },
+      "scoring": {
+        "scale": [1, 2, 3, 4, 5, 6, 7],
+        "labels": [
+          "Strongly disagree",
+          "Somewhat disagree",
+          "Slightly disagree",
+          "Neutral",
+          "Slightly agree",
+          "Somewhat agree",
+          "Strongly agree"
+        ],
+        "reverse_keyed": "Items marked as 'minus' keyed are reverse scored (8 - response). Higher scores indicate stronger tendency."
+      }
     }
   },
 

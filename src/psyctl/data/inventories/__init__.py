@@ -1,6 +1,7 @@
 """Psychological inventory modules."""
 
 from .base import BaseInventory
+from .indcolen import INDCOL
 from .ipip_neo import IPIPNEO
 from .registry import (
     INVENTORY_REGISTRY,
@@ -12,6 +13,7 @@ from .rei import REI
 
 __all__ = [
     "INVENTORY_REGISTRY",
+    "INDCOL",
     "IPIPNEO",
     "REI",
     "BaseInventory",
