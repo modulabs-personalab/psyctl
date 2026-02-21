@@ -235,6 +235,36 @@
         "reverse_keyed": "Domain scores are computed by summing item responses. Items marked as 'minus' keyed should be reverse scored (6 - response)."
       }
     },
+    "vgq_14": {
+      "name": "VGQ-14",
+      "description": "Victim Gaslighting Questionnaire (14 items) - Gaslighting victimization",
+      "version": "14",
+      "language": "en",
+      "num_questions": 14,
+      "data_file": "vgq_14_items_en.json",
+      "source": "Shuja, K. H., & Aqeel, M. (2021). International Journal of Human Rights in Healthcare, 16(1). https://doi.org/10.1108/IJHRH-12-2020-0119",
+      "license": "Academic",
+      "domains": {
+        "VGQ": {
+          "name": "Gaslighting Victimization",
+          "num_items": 14,
+          "population_mean": 42.0,
+          "population_std": 10.0,
+          "description": "Total gaslighting victimization score (range 14-70). Population norms are midpoint-based estimates; update when original paper norms are confirmed."
+        }
+      },
+      "scoring": {
+        "scale": [1, 2, 3, 4, 5],
+        "labels": [
+          "Strongly disagree",
+          "Disagree",
+          "Something in the middle",
+          "Agree",
+          "Strongly agree"
+        ],
+        "reverse_keyed": "No reverse-keyed items. All items are scored in the positive direction."
+      }
+    },
     "rei_40": {
       "name": "REI-40",
       "description": "Rational Experiential Inventory (40 items) - Dual-process thinking styles",

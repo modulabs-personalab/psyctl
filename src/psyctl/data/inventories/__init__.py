@@ -11,6 +11,7 @@ from .registry import (
 )
 from .rei import REI
 from .sd4 import SD4
+from .vgq import VGQ
 
 __all__ = [
     "INVENTORY_REGISTRY",
@@ -18,6 +19,7 @@ __all__ = [
     "IPIPNEO",
     "REI",
     "SD4",
+    "VGQ",
     "BaseInventory",
     "create_inventory",
     "get_available_inventories",

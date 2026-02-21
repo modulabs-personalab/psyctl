@@ -1,0 +1,212 @@
+[
+  {
+    "id": "vgq-001",
+    "text": "You constantly change your words or thoughts before speaking.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 1,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-002",
+    "text": "Your point of view is dismissed or said to be 'wrong' completely.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 2,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-003",
+    "text": "You get accused for 'overreacting' when you try to explain your feelings.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 3,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-004",
+    "text": "You apologize without knowing what you did wrong.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 4,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-005",
+    "text": "Most interactions leave you feeling small or ashamed of yourself.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 5,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-006",
+    "text": "They assign motives to your actions that are opposite to your intentions.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 6,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-007",
+    "text": "You often feel that you have to defend your reality from them.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 7,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-008",
+    "text": "They make you believe that nobody can be trusted except them.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 8,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-009",
+    "text": "You often find them denying things even when there is proof.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 9,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-010",
+    "text": "You feel unsure of your decision-making abilities because of their disagreement.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 10,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-011",
+    "text": "They accused you of lying and manipulation when in reality they are the ones doing it.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 11,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-012",
+    "text": "Their positive actions do not complement their degrading words.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 12,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-013",
+    "text": "You find yourself questioning your beliefs and opinions because of their opposition.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 13,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "vgq-014",
+    "text": "You often find yourself questioning your own sanity because of their words.",
+    "keyed": "plus",
+    "domain": "VGQ",
+    "facet": null,
+    "num": 14,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Something in the middle", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  }
+]
