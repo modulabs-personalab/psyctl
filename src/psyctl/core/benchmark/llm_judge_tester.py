@@ -279,7 +279,7 @@ class LLMJudgeTester:
             all_results.append(result)
 
             if output_dir:
-                self._save_result(result, output_dir, strength=0.0, layers=None)
+                self._save_result(result, output_dir, strength=0.0, resolved_layers=None)
 
         # Cleanup
         judge.cleanup()

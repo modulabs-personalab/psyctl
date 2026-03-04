@@ -163,16 +163,8 @@ class IPIPNEO(BaseInventory):
         Returns:
             Percentile (0-100)
         """
-        # Approximation of cumulative distribution function
-        # Using the error function approximation
+        # Use proper normal CDF via error function
         import math
 
-        # Simple approximation: percentile ≈ 50 + 34.13 * z for |z| < 3
-        if abs(z_score) < 3:
-            percentile = 50 + 34.13 * z_score
-        elif z_score >= 3:
-            percentile = 99.87
-        else:
-            percentile = 0.13
-
+        percentile = 50.0 * (1.0 + math.erf(z_score / math.sqrt(2.0)))
         return max(0.0, min(100.0, percentile))
