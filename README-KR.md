@@ -212,6 +212,23 @@ psyctl benchmark llm-as-judge \
 
 ---
 
+## PoC 노트북 (Google Colab)
+
+브라우저에서 psyctl을 직접 실행해 볼 수 있는 Colab 노트북입니다:
+
+| 노트북 | 설명 |
+|--------|------|
+| [PsyCtl로 Gemma-3-4b-it 성격 조향하기 (한국어)](https://colab.research.google.com/drive/12x92LqwshlDlxH9xn1JkeZTK7JkdTvzJ) | 전체 조향 워크플로우 한국어 버전: 레이어 분석, BiPO 추출, 텍스트 생성 |
+| [Steering Gemma-3-4b-it With PsyCtl (English)](https://colab.research.google.com/drive/1h84G02UYAgJ_GSm_1mhnerpK_HhMzO46) | 전체 조향 워크플로우: 레이어 분석, BiPO 추출, 텍스트 생성 |
+| [Steering Gemma-3-270m-it With PsyCtl](https://colab.research.google.com/drive/1TJCXjwuYd_IRghpg-uKQc1T4eDNkKdrl) | 270M 소형 모델을 사용한 빠른 테스트 버전 |
+| [CAA Extraction (Incremental Mean)](https://colab.research.google.com/drive/1uAFDbxjUXJKuH8CbdDZtGki74aFNajxz) | 메모리 효율적인 Incremental Mean 방식의 수동 CAA 벡터 추출 |
+| [BiPO PoC](https://colab.research.google.com/drive/1mK5_VXb8AWX9NzOe93BRSUJDoRbQWh5y) | distilgpt2를 사용한 BiPO 알고리즘 개념 증명 |
+| [Build CAA Dataset by P2](https://colab.research.google.com/drive/1AG2sqixvNTZWKCGYqEquPRhPCreA3hdo) | P2 성격 프롬프팅을 활용한 데이터셋 생성 |
+
+> **참고**: 이 노트북들은 HuggingFace 토큰이 필요합니다 (Colab 시크릿에 `HF_TOKEN`으로 설정). GPU 런타임 (T4 이상) 권장.
+
+---
+
 ## 기여하기
 
 기여를 환영합니다! [기여 가이드](./docs/CONTRIBUTING.md)에서 다음 내용을 확인하세요:

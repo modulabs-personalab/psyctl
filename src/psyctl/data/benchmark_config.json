@@ -234,6 +234,71 @@
         ],
         "reverse_keyed": "Domain scores are computed by summing item responses. Items marked as 'minus' keyed should be reverse scored (6 - response)."
       }
+    },
+    "rei_40": {
+      "name": "REI-40",
+      "description": "Rational Experiential Inventory (40 items) - Dual-process thinking styles",
+      "version": "40",
+      "language": "en",
+      "num_questions": 40,
+      "data_file": "rei_40_items_en.json",
+      "source": "Pacini & Epstein (1999). Journal of Personality and Social Psychology, 76, 972-987.",
+      "license": "Academic",
+      "domains": {
+        "RE": {
+          "name": "Rational Engagement",
+          "num_items": 10,
+          "population_mean": 34.4,
+          "population_std": 7.3,
+          "description": "Enjoyment of and tendency to engage in analytical thinking"
+        },
+        "RA": {
+          "name": "Rational Ability",
+          "num_items": 10,
+          "population_mean": 36.5,
+          "population_std": 6.1,
+          "description": "Ability to think logically and analytically"
+        },
+        "EE": {
+          "name": "Experiential Engagement",
+          "num_items": 10,
+          "population_mean": 33.4,
+          "population_std": 6.5,
+          "description": "Enjoyment of and reliance on intuitive thinking"
+        },
+        "EA": {
+          "name": "Experiential Ability",
+          "num_items": 10,
+          "population_mean": 35.5,
+          "population_std": 5.7,
+          "description": "Ability to rely on intuitive impressions and feelings"
+        },
+        "R": {
+          "name": "Rationality",
+          "num_items": 20,
+          "population_mean": 70.9,
+          "population_std": 11.8,
+          "description": "Overall rational thinking style (RA + RE)"
+        },
+        "E": {
+          "name": "Experientiality",
+          "num_items": 20,
+          "population_mean": 68.9,
+          "population_std": 10.2,
+          "description": "Overall experiential thinking style (EA + EE)"
+        }
+      },
+      "scoring": {
+        "scale": [1, 2, 3, 4, 5],
+        "labels": [
+          "Definitely not true of myself",
+          "Somewhat not true of myself",
+          "Neither true nor untrue of myself",
+          "Somewhat true of myself",
+          "Definitely true of myself"
+        ],
+        "reverse_keyed": "Items marked as 'minus' keyed are reverse scored (6 - response). Higher scores indicate stronger tendency."
+      }
     }
   },
 
