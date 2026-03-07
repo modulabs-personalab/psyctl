@@ -56,22 +56,31 @@ class LogProbScorer:
         
         for score in range(min_score, max_score + 1):
             score_str = str(score)
-            # Search for the numeric token in vocab
-            # Try different representations: "1", "▁1", " 1", etc.
-            found = False
+            # Strategy 1: Try direct token-to-id conversion (most reliable)
+            try:
+                direct_id = tokenizer.convert_tokens_to_ids(score_str)
+                if direct_id != tokenizer.unk_token_id:
+                    score_tokens[score] = direct_id
+                    continue
+            except (KeyError, AttributeError):
+                pass
+
+            # Strategy 2: Search vocab preferring exact/shortest match
+            candidates = []
             for token, token_id in vocab.items():
-                # Check if token matches the score (with or without whitespace/special chars)
-                if token == score_str or token.strip() == score_str or token.strip("▁ ") == score_str:
-                    score_tokens[score] = token_id
-                    found = True
-                    break
-            
-            # Fallback: try encoding and use the last token (numeric part)
-            if not found:
-                token_ids = tokenizer.encode(score_str, add_special_tokens=False)
-                if len(token_ids) >= 1:
-                    # Use the last token which is typically the actual number
-                    score_tokens[score] = token_ids[-1]
+                stripped = token.strip("▁ ")
+                if stripped == score_str:
+                    candidates.append((len(token), token, token_id))
+            if candidates:
+                # Prefer shortest token (exact digit over prefixed)
+                candidates.sort(key=lambda x: x[0])
+                score_tokens[score] = candidates[0][2]
+                continue
+
+            # Strategy 3: Fallback via encode
+            token_ids = tokenizer.encode(score_str, add_special_tokens=False)
+            if len(token_ids) >= 1:
+                score_tokens[score] = token_ids[-1]
 
         # Check if we found all expected tokens
         expected_count = max_score - min_score + 1
