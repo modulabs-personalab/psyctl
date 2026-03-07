@@ -206,16 +206,19 @@ class InventoryTester:
         domain_scores: dict[str, list[float]] = {}
 
         for question in tqdm(questions, desc="Evaluating", ncols=80, unit="q"):
-            prompt = self._create_prompt(question["text"])
+            score_range = self._get_score_range(question)
+            prompt = self._create_prompt(question)
             score, confidence = self._get_score_from_logits(
                 model,
                 tokenizer,
                 prompt,
+                score_range=score_range,
             )
 
             # Reverse scoring for minus-keyed items
             if question["keyed"] == "minus":
-                score = 6.0 - score
+                min_score, max_score = score_range
+                score = float(min_score + max_score) - score
 
             # Organize by domain
             domain = question["domain"]
@@ -225,9 +228,13 @@ class InventoryTester:
 
         return domain_scores
 
-    def _create_prompt(self, question_text: str) -> str:
-        """Create prompt for a single question."""
-        prompt = f"""Rate how accurately this statement describes you on a scale of 1 to 5:
+    def _create_prompt(self, question: dict[str, Any]) -> str:
+        """Create prompt for a single question based on question choices."""
+        question_text = question["text"]
+        choices = question.get("choices", [])
+
+        if not choices:
+            return f"""Rate how accurately this statement describes you on a scale of 1 to 5:
 
 Statement: "{question_text}"
 
@@ -239,13 +246,37 @@ Scale:
 5 = Very Accurate
 
 Your rating (1-5):"""
-        return prompt
+
+        sorted_choices = sorted(choices, key=lambda c: c["score"])
+        min_score = sorted_choices[0]["score"]
+        max_score = sorted_choices[-1]["score"]
+        scale_lines = "\n".join(
+            f"{choice['score']} = {choice['text']}" for choice in sorted_choices
+        )
+        return f"""Rate how accurately this statement describes you:
+
+Statement: "{question_text}"
+
+Scale:
+{scale_lines}
+
+Your rating ({min_score}-{max_score}):"""
+
+    def _get_score_range(self, question: dict[str, Any]) -> tuple[int, int]:
+        """Extract score range from question choices with a 1-5 fallback."""
+        choices = question.get("choices", [])
+        if not choices:
+            return (1, 5)
+
+        sorted_choices = sorted(choices, key=lambda c: c["score"])
+        return (int(sorted_choices[0]["score"]), int(sorted_choices[-1]["score"]))
 
     def _get_score_from_logits(
         self,
         model: Any,
         tokenizer: Any,
         prompt: str,
+        score_range: tuple[int, int] = (1, 5),
     ) -> tuple[float, float]:
         """
         Get weighted score from model logits using log probability.
@@ -269,12 +300,17 @@ Your rating (1-5):"""
         logits = outputs.logits[0, -1, :]  # (vocab_size,)
 
         # Calculate weighted score
-        weighted_score, confidence = self._calculate_weighted_score(logits, tokenizer)
+        weighted_score, confidence = self._calculate_weighted_score(
+            logits, tokenizer, score_range=score_range
+        )
 
         return weighted_score, confidence
 
     def _calculate_weighted_score(
-        self, logits: torch.Tensor, tokenizer: Any
+        self,
+        logits: torch.Tensor,
+        tokenizer: Any,
+        score_range: tuple[int, int] = (1, 5),
     ) -> tuple[float, float]:
         """
         Calculate weighted score from logits using softmax.
@@ -289,7 +325,7 @@ Your rating (1-5):"""
             (weighted_score, confidence)
         """
         return LogProbScorer.calculate_weighted_score(
-            logits, tokenizer, score_range=(1, 5)
+            logits, tokenizer, score_range=score_range
         )
 
     def _calculate_domain_scores(

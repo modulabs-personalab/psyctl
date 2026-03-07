@@ -144,16 +144,15 @@ def _print_domain_table(scores: dict[str, dict[str, float]]):
     table.add_column("Z-Score", justify="right")
     table.add_column("Percentile", justify="right", style="green")
 
-    for domain_code in ["N", "E", "O", "A", "C"]:
-        if domain_code in scores:
-            s = scores[domain_code]
-            table.add_row(
-                s["domain_name"],
-                f"{s['raw_score']:.2f} / {s['num_items']*5}",
-                f"{s['population_mean']:.1f} ± {s['population_std']:.1f}",
-                f"{s['z_score']:+.2f}",
-                f"{s['percentile']:.1f}%",
-            )
+    for domain_code in sorted(scores.keys()):
+        s = scores[domain_code]
+        table.add_row(
+            s["domain_name"],
+            f"{s['raw_score']:.2f}",
+            f"{s['population_mean']:.1f} ± {s['population_std']:.1f}",
+            f"{s['z_score']:+.2f}",
+            f"{s['percentile']:.1f}%",
+        )
 
     console.print(table)
 
@@ -168,17 +167,16 @@ def _print_comparison_table(comparison: dict[str, dict[str, float]]):
     table.add_column("% Change", justify="right", style="yellow")
     table.add_column("Z-Score Δ", justify="right", style="magenta")
 
-    for domain_code in ["N", "E", "O", "A", "C"]:
-        if domain_code in comparison:
-            c = comparison[domain_code]
-            change_style = "green" if c["change"] > 0 else "red"
-            table.add_row(
-                c["domain_name"],
-                f"{c['baseline_raw']:.2f}",
-                f"{c['steered_raw']:.2f}",
-                f"[{change_style}]{c['change']:+.2f}[/{change_style}]",
-                f"[{change_style}]{c['percent_change']:+.1f}%[/{change_style}]",
-                f"{c['z_change']:+.2f}",
-            )
+    for domain_code in sorted(comparison.keys()):
+        c = comparison[domain_code]
+        change_style = "green" if c["change"] > 0 else "red"
+        table.add_row(
+            c["domain_name"],
+            f"{c['baseline_raw']:.2f}",
+            f"{c['steered_raw']:.2f}",
+            f"[{change_style}]{c['change']:+.2f}[/{change_style}]",
+            f"[{change_style}]{c['percent_change']:+.1f}%[/{change_style}]",
+            f"{c['z_change']:+.2f}",
+        )
 
     console.print(table)
