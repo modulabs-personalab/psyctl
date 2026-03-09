@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -119,11 +120,5 @@ class INDCOL(BaseInventory):
 
     def _z_to_percentile(self, z_score: float) -> float:
         """Convert z-score to percentile using normal CDF approximation."""
-        if abs(z_score) < 3:
-            percentile = 50 + 34.13 * z_score
-        elif z_score >= 3:
-            percentile = 99.87
-        else:
-            percentile = 0.13
-
+        percentile = 50.0 * (1.0 + math.erf(z_score / math.sqrt(2.0)))
         return max(0.0, min(100.0, percentile))
