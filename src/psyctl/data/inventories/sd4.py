@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -88,7 +89,7 @@ class SD4(BaseInventory):
         Raises:
             ValueError: If trait is not recognized
         """
-        trait_map = {
+        trait_map: dict[str, str] = {
             "M": "M",
             "Machiavellianism": "M",
             "machiavellianism": "M",
@@ -127,7 +128,7 @@ class SD4(BaseInventory):
         Returns:
             Dict with domain scores including raw score, z-score, percentile
         """
-        results = {}
+        results: dict[str, dict[str, float]] = {}
 
         for domain, scores in responses.items():
             if domain not in self.config["domains"]:
@@ -149,7 +150,7 @@ class SD4(BaseInventory):
                 "population_std": std,
                 "z_score": z_score,
                 "percentile": percentile,
-                "num_items": len(scores),
+                "num_items": float(len(scores)),
             }
 
         return results
@@ -164,11 +165,5 @@ class SD4(BaseInventory):
         Returns:
             Percentile (0-100)
         """
-        if abs(z_score) < 3:
-            percentile = 50 + 34.13 * z_score
-        elif z_score >= 3:
-            percentile = 99.87
-        else:
-            percentile = 0.13
-
+        percentile = 50.0 * (1.0 + math.erf(z_score / math.sqrt(2.0)))
         return max(0.0, min(100.0, percentile))
