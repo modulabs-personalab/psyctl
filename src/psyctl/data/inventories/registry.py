@@ -21,6 +21,8 @@ def register_inventory(name: str):
 
     def decorator(cls: type[BaseInventory]) -> type[BaseInventory]:
         INVENTORY_REGISTRY[name] = cls
+        if not hasattr(cls, "registry_name") or not cls.registry_name:
+            cls.registry_name = name  # type: ignore[attr-defined]
         return cls
 
     return decorator

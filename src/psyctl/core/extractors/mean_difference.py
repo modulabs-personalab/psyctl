@@ -9,40 +9,23 @@ from torch import nn
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
-from psyctl.config import INFERENCE_BATCH_SIZE
 from psyctl.core.extractors.base import BaseVectorExtractor
 from psyctl.core.hook_manager import ActivationHookManager
-from psyctl.core.layer_accessor import LayerAccessor
-from psyctl.core.logger import get_logger
-from psyctl.core.steer_dataset_loader import SteerDatasetLoader
 
 
 class MeanDifferenceActivationVectorExtractor(BaseVectorExtractor):
-    """
-    Extract steering vectors using mean difference of activations.
-
-    This extractor computes steering vectors by taking the mean difference
-    between activations from positive and neutral personality prompts.
-    The extracted vectors are later applied using CAA (Contrastive Activation Addition).
+    """Extract steering vectors using mean difference of activations.
 
     Algorithm:
-    1. Collect activations from positive prompts → compute mean
-    2. Collect activations from neutral prompts → compute mean
+    1. Collect activations from positive prompts -> compute mean
+    2. Collect activations from neutral prompts -> compute mean
     3. Steering vector = mean(positive) - mean(neutral)
-
-    Attributes:
-        hook_manager: Manager for forward hooks
-        dataset_loader: Loader for steering dataset
-        layer_accessor: Accessor for dynamic layer retrieval
-        logger: Logger instance
     """
 
     def __init__(self):
         """Initialize MeanDifferenceActivationVectorExtractor."""
+        super().__init__(logger_name="mdav_extractor")
         self.hook_manager = ActivationHookManager()
-        self.dataset_loader = SteerDatasetLoader()
-        self.layer_accessor = LayerAccessor()
-        self.logger = get_logger("mdav_extractor")
 
     def extract(
         self,
@@ -100,34 +83,14 @@ class MeanDifferenceActivationVectorExtractor(BaseVectorExtractor):
             ...     batch_size=16
             ... )
         """
-        # Validate dataset parameters
-        if dataset is not None and dataset_path is not None:
-            raise ValueError(
-                "Cannot provide both 'dataset' and 'dataset_path'. Choose one."
-            )
-        if dataset is None and dataset_path is None:
-            raise ValueError("Must provide either 'dataset' or 'dataset_path'.")
-
-        if batch_size is None:
-            batch_size = INFERENCE_BATCH_SIZE
+        self._validate_dataset_params(dataset, dataset_path)
+        batch_size = self._resolve_batch_size(batch_size)
 
         self.logger.info(f"Extracting steering vectors from {len(layers)} layers")
-        self.logger.info(f"Dataset: {'pre-loaded' if dataset else dataset_path}")
-        self.logger.info(f"Batch size: {batch_size}")
-        self.logger.info(f"Normalize: {normalize}")
-        self.logger.info(f"Use chat template: {use_chat_template}")
+        self.logger.info(f"Batch size: {batch_size}, Normalize: {normalize}")
 
-        # 1. Validate layers
-        self.logger.info("Validating layer paths...")
-        if not self.layer_accessor.validate_layers(model, layers):
-            raise ValueError("Some layer paths are invalid")
-
-        # 2. Load dataset if not provided
-        if dataset is None:
-            self.logger.info("Loading dataset...")
-            dataset = self.dataset_loader.load(dataset_path)  # type: ignore[arg-type]
-        else:
-            self.logger.info("Using pre-loaded dataset...")
+        self._validate_layers(model, layers)
+        dataset = self._load_dataset(dataset, dataset_path)
 
         positive_prompts, neutral_prompts = self.dataset_loader.create_prompts(
             dataset, tokenizer, format_type="index", use_chat_template=use_chat_template
@@ -137,11 +100,7 @@ class MeanDifferenceActivationVectorExtractor(BaseVectorExtractor):
             f"Loaded {len(positive_prompts)} positive and {len(neutral_prompts)} neutral prompts"
         )
 
-        # 3. Get layer modules
-        layer_modules = {}
-        for layer_str in layers:
-            layer_module = self.layer_accessor.get_layer(model, layer_str)
-            layer_modules[layer_str] = layer_module
+        layer_modules = self._resolve_layer_modules(model, layers)
 
         # 4. Collect positive activations
         self.logger.info("Collecting positive activations...")
@@ -160,7 +119,7 @@ class MeanDifferenceActivationVectorExtractor(BaseVectorExtractor):
 
         # 6. Compute steering vectors
         self.logger.info("Computing steering vectors...")
-        steering_vectors = {}
+        steering_vectors: dict[str, torch.Tensor] = {}
 
         for layer_name in layers:
             positive_key = f"{layer_name}_positive"
@@ -173,17 +132,6 @@ class MeanDifferenceActivationVectorExtractor(BaseVectorExtractor):
                 continue
 
             steering_vec = positive_means[positive_key] - neutral_means[neutral_key]
-
-            if normalize:
-                norm = steering_vec.norm()
-                if norm > 1e-8:
-                    steering_vec = steering_vec / norm
-                    self.logger.debug(f"Normalized vector for '{layer_name}'")
-                else:
-                    self.logger.warning(
-                        f"Vector for '{layer_name}' has near-zero norm, skipping normalization"
-                    )
-
             steering_vectors[layer_name] = steering_vec
 
             self.logger.info(
@@ -194,7 +142,7 @@ class MeanDifferenceActivationVectorExtractor(BaseVectorExtractor):
         self.logger.info(
             f"Successfully extracted {len(steering_vectors)} steering vectors"
         )
-        return steering_vectors
+        return self._normalize_vectors(steering_vectors, normalize)
 
     def _collect_activations(
         self,

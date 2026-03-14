@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-import json
-import math
-from pathlib import Path
-from typing import Any
+from typing import ClassVar
 
 from .base import BaseInventory
 from .registry import register_inventory
@@ -15,80 +12,15 @@ from .registry import register_inventory
 class SD4(BaseInventory):
     """SD4 (Short Dark Tetrad) - Dark personality traits."""
 
-    def __init__(self, version: str = "28"):
-        """
-        Initialize SD4 inventory.
-
-        Args:
-            version: Version of the inventory ("28")
-        """
-        self.name = f"SD4-{version}"
-        self.domain = "Dark Tetrad"
-        self.license = "Academic"
-        super().__init__(version=version)
-
-    def _load_config(self) -> dict[str, Any]:
-        """Load inventory configuration."""
-        config_path = Path(__file__).parent.parent / "benchmark_config.json"
-        with open(config_path, encoding="utf-8") as f:
-            all_configs = json.load(f)
-
-        inventory_key = "sd4"
-        if (
-            "inventories" not in all_configs
-            or inventory_key not in all_configs["inventories"]
-        ):
-            raise ValueError("SD4 inventory not found in config")
-
-        return all_configs["inventories"][inventory_key]
-
-    def _load_questions(self) -> list[dict[str, Any]]:
-        """Load questions from data file."""
-        data_file = self.config["data_file"]
-        data_path = Path(__file__).parent / data_file
-
-        with open(data_path, encoding="utf-8") as f:
-            questions = json.load(f)
-
-        return questions
-
-    def get_questions_by_domain(self, domain: str) -> list[dict[str, Any]]:
-        """
-        Get questions for a specific domain.
-
-        Args:
-            domain: Domain code (M, N, P, S)
-
-        Returns:
-            List of questions for that domain
-        """
-        return [q for q in self.questions if q["domain"] == domain]
-
-    def get_supported_traits(self) -> list[dict[str, str]]:
-        """
-        Get list of supported personality traits.
-
-        Returns:
-            List of dicts with trait code and full name
-        """
-        traits = []
-        for code, info in self.config["domains"].items():
-            traits.append({"code": code, "name": info["name"]})
-        return traits
+    registry_name: ClassVar[str] = "sd4"
+    config_key: ClassVar[str | None] = "sd4"
+    default_version: ClassVar[str] = "28"
+    display_name: ClassVar[str] = "SD4"
+    domain_label: ClassVar[str] = "Dark Tetrad"
+    license_type: ClassVar[str] = "Academic"
 
     def _normalize_trait(self, trait: str) -> str:
-        """
-        Normalize trait name to domain code.
-
-        Args:
-            trait: Trait code or full name (e.g., "M", "Machiavellianism")
-
-        Returns:
-            Domain code (M, N, P, S)
-
-        Raises:
-            ValueError: If trait is not recognized
-        """
+        """Normalize trait name to domain code."""
         trait_map: dict[str, str] = {
             "M": "M",
             "Machiavellianism": "M",
@@ -115,55 +47,3 @@ class SD4(BaseInventory):
             )
 
         return trait_code
-
-    def calculate_scores(
-        self, responses: dict[str, list[float]]
-    ) -> dict[str, dict[str, float]]:
-        """
-        Calculate personality scores from responses.
-
-        Args:
-            responses: Dict mapping domain codes to list of scores
-
-        Returns:
-            Dict with domain scores including raw score, z-score, percentile
-        """
-        results: dict[str, dict[str, float]] = {}
-
-        for domain, scores in responses.items():
-            if domain not in self.config["domains"]:
-                continue
-
-            domain_config = self.config["domains"][domain]
-            raw_score = sum(scores)
-            mean = domain_config["population_mean"]
-            std = domain_config["population_std"]
-
-            z_score = (raw_score - mean) / std if std > 0 else 0.0
-            percentile = self._z_to_percentile(z_score)
-
-            results[domain] = {
-                "domain_name": domain_config["name"],
-                "raw_score": raw_score,
-                "mean_score": raw_score / len(scores) if scores else 0.0,
-                "population_mean": mean,
-                "population_std": std,
-                "z_score": z_score,
-                "percentile": percentile,
-                "num_items": float(len(scores)),
-            }
-
-        return results
-
-    def _z_to_percentile(self, z_score: float) -> float:
-        """
-        Convert z-score to percentile using normal CDF approximation.
-
-        Args:
-            z_score: Standard score
-
-        Returns:
-            Percentile (0-100)
-        """
-        percentile = 50.0 * (1.0 + math.erf(z_score / math.sqrt(2.0)))
-        return max(0.0, min(100.0, percentile))

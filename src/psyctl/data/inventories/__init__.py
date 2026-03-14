@@ -14,8 +14,8 @@ from .sd4 import SD4
 from .vgq import VGQ
 
 __all__ = [
-    "INVENTORY_REGISTRY",
     "INDCOL",
+    "INVENTORY_REGISTRY",
     "IPIPNEO",
     "REI",
     "SD4",

@@ -12,43 +12,22 @@ from torch.optim import AdamW
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
-from psyctl.config import INFERENCE_BATCH_SIZE
 from psyctl.core.extractors.base import BaseVectorExtractor
-from psyctl.core.layer_accessor import LayerAccessor
-from psyctl.core.logger import get_logger
-from psyctl.core.steer_dataset_loader import SteerDatasetLoader
 
 
 class BiPOVectorExtractor(BaseVectorExtractor):
-    """
-    Extract steering vectors using Bi-directional Preference Optimization.
-
-    This extractor implements the BiPO method by optimizing a steering vector
-    through gradient descent based on preference learning between positive
-    and neutral personality responses.
+    """Extract steering vectors using Bi-directional Preference Optimization.
 
     Algorithm:
     1. Initialize learnable steering vector v with zeros
-    2. For each epoch:
-        - Randomly sample direction d ∈ {-1, 1}
-        - Compute log probabilities with and without steering
-        - Optimize BiPO loss: -log(sigmoid(β * d * (ratio_pos - ratio_neg)))
-    3. Return optimized steering vector
-
-    The BiPO loss encourages the model to prefer positive responses when
-    steering is applied in the positive direction, and vice versa.
-
-    Attributes:
-        dataset_loader: Loader for steering dataset
-        layer_accessor: Accessor for dynamic layer retrieval
-        logger: Logger instance
+    2. For each epoch, randomly sample direction d in {-1, 1}
+    3. Optimize BiPO loss: -log(sigmoid(beta * d * (ratio_pos - ratio_neg)))
+    4. Return optimized steering vector
     """
 
     def __init__(self):
         """Initialize BiPOVectorExtractor."""
-        self.dataset_loader = SteerDatasetLoader()
-        self.layer_accessor = LayerAccessor()
-        self.logger = get_logger("bipo_extractor")
+        super().__init__(logger_name="bipo_extractor")
 
     def extract(
         self,
@@ -104,37 +83,16 @@ class BiPOVectorExtractor(BaseVectorExtractor):
             ...     epochs=10
             ... )
         """
-        # Validate dataset parameters
-        if dataset is not None and dataset_path is not None:
-            raise ValueError(
-                "Cannot provide both 'dataset' and 'dataset_path'. Choose one."
-            )
-        if dataset is None and dataset_path is None:
-            raise ValueError("Must provide either 'dataset' or 'dataset_path'.")
-
-        if batch_size is None:
-            batch_size = INFERENCE_BATCH_SIZE
+        self._validate_dataset_params(dataset, dataset_path)
+        batch_size = self._resolve_batch_size(batch_size)
 
         self.logger.info(f"Extracting BiPO steering vectors from {len(layers)} layers")
-        self.logger.info(f"Dataset: {'pre-loaded' if dataset else dataset_path}")
-        self.logger.info(f"Batch size: {batch_size}")
-        self.logger.info(f"Learning rate: {lr}")
-        self.logger.info(f"Beta: {beta}")
-        self.logger.info(f"Epochs: {epochs}")
-        self.logger.info(f"Normalize: {normalize}")
-        self.logger.info(f"Use chat template: {use_chat_template}")
+        self.logger.info(
+            f"Batch size: {batch_size}, lr: {lr}, beta: {beta}, epochs: {epochs}"
+        )
 
-        # 1. Validate layers
-        self.logger.info("Validating layer paths...")
-        if not self.layer_accessor.validate_layers(model, layers):
-            raise ValueError("Some layer paths are invalid")
-
-        # 2. Load dataset if not provided
-        if dataset is None:
-            self.logger.info("Loading dataset...")
-            dataset = self.dataset_loader.load(dataset_path)  # type: ignore[arg-type]
-        else:
-            self.logger.info("Using pre-loaded dataset...")
+        self._validate_layers(model, layers)
+        dataset = self._load_dataset(dataset, dataset_path)
 
         # 3. Freeze model parameters
         for param in model.parameters():
@@ -167,16 +125,6 @@ class BiPOVectorExtractor(BaseVectorExtractor):
                 use_chat_template=use_chat_template,
             )
 
-            if normalize:
-                norm = steering_vec.norm()
-                if norm > 1e-8:
-                    steering_vec = steering_vec / norm
-                    self.logger.debug(f"Normalized vector for '{layer_str}'")
-                else:
-                    self.logger.warning(
-                        f"Vector for '{layer_str}' has near-zero norm, skipping normalization"
-                    )
-
             steering_vectors[layer_str] = steering_vec
 
             self.logger.info(
@@ -188,7 +136,7 @@ class BiPOVectorExtractor(BaseVectorExtractor):
         self.logger.info(
             f"Successfully extracted {len(steering_vectors)} steering vectors"
         )
-        return steering_vectors
+        return self._normalize_vectors(steering_vectors, normalize)
 
     def _train_steering_vector(
         self,
