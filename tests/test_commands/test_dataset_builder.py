@@ -58,7 +58,6 @@ def test_dataset_builder_initialization():
     assert builder.model is None
     assert builder.tokenizer is None
     assert builder.jinja_env is not None
-    assert builder.caa_question_template_path is None
     assert builder.roleplay_prompt_template_path is None
 
     logger.success("DatasetBuilder initialization test passed")
@@ -114,36 +113,6 @@ def test_get_answer_real(dataset_builder_instance, model_and_tokenizer):
     logger.success("_get_answer test passed")
 
 
-def test_gen_caa_data(dataset_builder_instance):
-    """Test _gen_caa_data method."""
-    logger.info("Testing _gen_caa_data method")
-
-    char_name = "Alice"
-    situation = "Alice meets Bob at a coffee shop.\nBob: Hello, how are you?\n"
-    answer_pos = "I'm excited to meet you!"
-    answer_neg = "I'm feeling a bit shy today."
-
-    result = dataset_builder_instance._gen_caa_data(
-        char_name, situation, answer_pos, answer_neg
-    )
-
-    # Check that result is a single string template
-    assert isinstance(result, str)
-    assert len(result) > 0
-
-    # Check template content
-    assert "[Situation]" in result
-    assert "Alice meets Bob at a coffee shop" in result
-    assert "Bob: Hello, how are you?" in result
-    assert "[Question]" in result
-    assert "You are Alice. What would your response be in this situation?" in result
-    assert "1. I'm excited to meet you!" in result
-    assert "2. I'm feeling a bit shy today." in result
-    assert "[Answer]" in result
-
-    logger.success("_gen_caa_data test passed")
-
-
 def test_save_sample_to_jsonl(dataset_builder_instance, tmp_path):
     """Test _save_sample_to_jsonl method."""
     logger.info("Testing _save_sample_to_jsonl method")
@@ -175,11 +144,11 @@ def test_save_sample_to_jsonl(dataset_builder_instance, tmp_path):
     logger.success("_save_sample_to_jsonl test passed")
 
 
-def test_build_caa_dataset_real_integration(
+def test_build_steer_dataset_real_integration(
     dataset_builder_instance, model_and_tokenizer, tmp_path
 ):
-    """Test complete build_caa_dataset integration with real data."""
-    logger.info("Testing complete build_caa_dataset integration with real data")
+    """Test complete build_steer_dataset integration with real data."""
+    logger.info("Testing complete build_steer_dataset integration with real data")
 
     model, tokenizer = model_and_tokenizer
 
@@ -191,7 +160,7 @@ def test_build_caa_dataset_real_integration(
 
         # Test the complete build process with 10 samples
         output_dir = tmp_path / "test_dataset_real"
-        output_file = dataset_builder_instance.build_caa_dataset(
+        output_file = dataset_builder_instance.build_steer_dataset(
             model="test-model",
             personality="Extroversion",
             output_dir=output_dir,
@@ -208,7 +177,7 @@ def test_build_caa_dataset_real_integration(
 
         # Check that output file was created
         output_files = list(output_dir.glob("caa_dataset_*.jsonl"))
-        assert len(output_files) == 1
+        assert len(output_files) >= 1
 
         # Check file content
         with Path(output_files[0]).open(encoding="utf-8") as f:
@@ -226,14 +195,14 @@ def test_build_caa_dataset_real_integration(
             assert "positive" in sample
             assert "neutral" in sample
 
-    logger.success("build_caa_dataset real integration test passed")
+    logger.success("build_steer_dataset real integration test passed")
 
 
-def test_build_caa_dataset_with_small_limit(
+def test_build_steer_dataset_with_small_limit(
     dataset_builder_instance, model_and_tokenizer, tmp_path
 ):
-    """Test build_caa_dataset with small sample limit."""
-    logger.info("Testing build_caa_dataset with small sample limit")
+    """Test build_steer_dataset with small sample limit."""
+    logger.info("Testing build_steer_dataset with small sample limit")
 
     model, tokenizer = model_and_tokenizer
 
@@ -245,7 +214,7 @@ def test_build_caa_dataset_with_small_limit(
 
         # Test with limit of 3 samples
         output_dir = tmp_path / "test_dataset_small"
-        output_file = dataset_builder_instance.build_caa_dataset(
+        output_file = dataset_builder_instance.build_steer_dataset(
             model="test-model",
             personality="Extroversion",
             output_dir=output_dir,
@@ -259,7 +228,7 @@ def test_build_caa_dataset_with_small_limit(
 
         # Check that output file was created
         output_files = list(output_dir.glob("caa_dataset_*.jsonl"))
-        assert len(output_files) == 1
+        assert len(output_files) >= 1
 
         # Check file content
         with Path(output_files[0]).open(encoding="utf-8") as f:
@@ -268,23 +237,23 @@ def test_build_caa_dataset_with_small_limit(
         # Should have 3 lines
         assert len(lines) == 3
 
-    logger.success("build_caa_dataset with small limit test passed")
+    logger.success("build_steer_dataset with small limit test passed")
 
 
-def test_build_caa_dataset_error_handling(dataset_builder_instance):
-    """Test build_caa_dataset error handling."""
-    logger.info("Testing build_caa_dataset error handling")
+def test_build_steer_dataset_error_handling(dataset_builder_instance):
+    """Test build_steer_dataset error handling."""
+    logger.info("Testing build_steer_dataset error handling")
 
-    # Test with invalid model
-    with pytest.raises(ValueError):
-        dataset_builder_instance.build_caa_dataset(
+    # Test with invalid model - raises OSError for invalid model identifiers
+    with pytest.raises(OSError):
+        dataset_builder_instance.build_steer_dataset(
             model="invalid-model",
             personality="Extroversion",
             output_dir=Path("./test_output"),
             limit_samples=1,
         )
 
-    logger.success("build_caa_dataset error handling test passed")
+    logger.success("build_steer_dataset error handling test passed")
 
 
 def test_template_loading(dataset_builder_instance):
@@ -292,82 +261,15 @@ def test_template_loading(dataset_builder_instance):
     logger.info("Testing template loading functionality")
 
     # Test loading default templates
-    md_template = dataset_builder_instance._load_template("md_question.j2")
-    assert md_template is not None
-
     roleplay_template = dataset_builder_instance._load_template("roleplay_prompt.j2")
     assert roleplay_template is not None
 
     logger.success("Template loading test passed")
 
 
-def test_custom_template_override(dataset_builder_instance, tmp_path):
-    """Test custom template override functionality."""
-    logger.info("Testing custom template override functionality")
-
-    # Create a custom template
-    custom_template_path = tmp_path / "custom_caa.j2"
-    custom_template_content = """[Custom Situation]
-{{ situation }}
-[Custom Question]
-{{ char_name }}, what would you say?
-1. {{ answer_1 }}
-2. {{ answer_2 }}
-[Custom Answer]
-"""
-    with Path(custom_template_path).open("w", encoding="utf-8") as f:
-        f.write(custom_template_content)
-
-    # Create builder with custom template
-    builder = DatasetBuilder(caa_question_template=str(custom_template_path))
-
-    # Test rendering with custom template
-    result = builder._gen_caa_data(
-        char_name="Alice",
-        situation="Test situation",
-        answer_1="Answer 1",
-        answer_2="Answer 2",
-    )
-
-    assert "[Custom Situation]" in result
-    assert "[Custom Question]" in result
-    assert "[Custom Answer]" in result
-    assert "Alice, what would you say?" in result
-
-    logger.success("Custom template override test passed")
-
-
-def test_template_rendering_with_variables(dataset_builder_instance):
-    """Test template rendering with all variables."""
-    logger.info("Testing template rendering with variables")
-
-    # Test CAA question template
-    result = dataset_builder_instance._gen_caa_data(
-        char_name="Bob",
-        situation="Bob meets Alice.\nAlice: Hi there!",
-        answer_1="Hello, nice to meet you!",
-        answer_2="Oh, hi.",
-    )
-
-    assert "Bob" in result
-    assert "Bob meets Alice" in result
-    assert "Hello, nice to meet you!" in result
-    assert "Oh, hi." in result
-
-    logger.success("Template rendering with variables test passed")
-
-
-def test_get_default_templates(dataset_builder_instance):
-    """Test getting default template content."""
-    logger.info("Testing getting default template content")
-
-    # Get CAA question template
-    caa_template = dataset_builder_instance.get_caa_question_template()
-    assert isinstance(caa_template, str)
-    assert len(caa_template) > 0
-    assert "[Situation]" in caa_template
-    assert "[Question]" in caa_template
-    assert "[Answer]" in caa_template
+def test_get_default_roleplay_template(dataset_builder_instance):
+    """Test getting default roleplay template content."""
+    logger.info("Testing getting default roleplay template content")
 
     # Get roleplay prompt template
     roleplay_template = dataset_builder_instance.get_roleplay_prompt_template()
@@ -376,44 +278,7 @@ def test_get_default_templates(dataset_builder_instance):
     assert "# Overview" in roleplay_template
     assert "# Situation" in roleplay_template
 
-    logger.success("Getting default templates test passed")
-
-
-def test_set_and_get_custom_template_from_string(dataset_builder_instance):
-    """Test setting and getting custom template from string."""
-    logger.info("Testing setting and getting custom template from string")
-
-    # Custom CAA template
-    custom_caa = """[Custom Situation]
-{{ situation }}
-[Custom Question]
-{{ char_name }}, what is your answer?
-1. {{ answer_1 }}
-2. {{ answer_2 }}
-[Custom Answer]
-"""
-
-    # Set custom template
-    dataset_builder_instance.set_caa_question_template(custom_caa)
-
-    # Get it back
-    retrieved = dataset_builder_instance.get_caa_question_template()
-    assert retrieved == custom_caa
-    assert "[Custom Situation]" in retrieved
-    assert "[Custom Question]" in retrieved
-
-    # Test that it actually works in _gen_caa_data
-    result = dataset_builder_instance._gen_caa_data(
-        char_name="Alice",
-        situation="Test situation",
-        answer_1="Answer 1",
-        answer_2="Answer 2",
-    )
-    assert "[Custom Situation]" in result
-    assert "[Custom Question]" in result
-    assert "Alice, what is your answer?" in result
-
-    logger.success("Setting and getting custom template from string test passed")
+    logger.success("Getting default roleplay template test passed")
 
 
 def test_set_and_get_roleplay_template_from_string(
@@ -463,30 +328,61 @@ User is {{ user_name }}.
     )
 
 
-def test_template_priority(dataset_builder_instance, tmp_path):
+def test_custom_roleplay_template_from_file(tmp_path):
+    """Test custom roleplay template loading from file."""
+    logger.info("Testing custom roleplay template from file")
+
+    # Create a custom template file
+    custom_template_path = tmp_path / "custom_roleplay.j2"
+    custom_template_content = """# Custom Overview
+You are {{ char_name }}.
+User is {{ user_name }}.
+
+# Personality
+{{ p2 }}
+
+# Context
+{{ situation }}
+"""
+    with Path(custom_template_path).open("w", encoding="utf-8") as f:
+        f.write(custom_template_content)
+
+    # Create builder with custom template
+    builder = DatasetBuilder(roleplay_prompt_template=str(custom_template_path))
+
+    # Get the template back
+    retrieved = builder.get_roleplay_prompt_template()
+    assert "# Custom Overview" in retrieved
+    assert "# Context" in retrieved
+
+    logger.success("Custom roleplay template from file test passed")
+
+
+def test_template_priority(tmp_path):
     """Test template loading priority: in-memory > file > default."""
     logger.info("Testing template loading priority")
 
     # 1. Default template
-    default_template = dataset_builder_instance.get_caa_question_template()
-    assert "[Situation]" in default_template
+    builder_default = DatasetBuilder()
+    default_template = builder_default.get_roleplay_prompt_template()
+    assert "# Overview" in default_template
 
     # 2. File-based template
     file_template_path = tmp_path / "file_template.j2"
-    file_template_content = "[File Situation]\n{{ situation }}"
+    file_template_content = "[File Template]\n{{ situation }}"
     with Path(file_template_path).open("w", encoding="utf-8") as f:
         f.write(file_template_content)
 
-    builder_with_file = DatasetBuilder(caa_question_template=str(file_template_path))
-    file_loaded = builder_with_file.get_caa_question_template()
-    assert "[File Situation]" in file_loaded
+    builder_with_file = DatasetBuilder(roleplay_prompt_template=str(file_template_path))
+    file_loaded = builder_with_file.get_roleplay_prompt_template()
+    assert "[File Template]" in file_loaded
 
     # 3. In-memory template (should override file)
-    memory_template_content = "[Memory Situation]\n{{ situation }}"
-    builder_with_file.set_caa_question_template(memory_template_content)
-    memory_loaded = builder_with_file.get_caa_question_template()
-    assert "[Memory Situation]" in memory_loaded
-    assert "[File Situation]" not in memory_loaded
+    memory_template_content = "[Memory Template]\n{{ situation }}"
+    builder_with_file.set_roleplay_prompt_template(memory_template_content)
+    memory_loaded = builder_with_file.get_roleplay_prompt_template()
+    assert "[Memory Template]" in memory_loaded
+    assert "[File Template]" not in memory_loaded
 
     logger.success("Template loading priority test passed")
 

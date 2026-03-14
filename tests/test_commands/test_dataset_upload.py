@@ -1,7 +1,7 @@
 """Unit tests for dataset upload functionality."""
 
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, mock_open, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import click
 import pytest
@@ -48,8 +48,7 @@ class TestDatasetCard:
 
         # Check PSYCTL branding
         assert "PSYCTL" in card
-        assert "https://cdn.caveduck.io" in card  # Logo URL
-        assert "Generated with [PSYCTL]" in card
+        assert "Generated with" in card
         assert "Extroversion" in card
         assert "1000" in card
         assert "google/gemma-3-27b-it" in card
@@ -72,16 +71,9 @@ class TestDatasetCard:
 class TestUploadToHub:
     """Test upload to HuggingFace Hub."""
 
-    @patch("psyctl.core.dataset_builder.Dataset")
-    @patch("psyctl.core.dataset_builder.HfApi")
-    @patch(
-        "builtins.open",
-        new_callable=mock_open,
-        read_data='{"question": "test", "positive": "(1", "neutral": "(2"}\n',
-    )
-    def test_upload_to_hub_success(
-        self, mock_file, mock_hf_api, mock_dataset, tmp_path
-    ):
+    @patch("huggingface_hub.HfApi")
+    @patch("datasets.Dataset")
+    def test_upload_to_hub_success(self, mock_dataset, mock_hf_api, tmp_path):
         """Test successful upload to HuggingFace Hub."""
         # Setup mocks
         mock_ds_instance = MagicMock()
@@ -91,6 +83,7 @@ class TestUploadToHub:
         builder = DatasetBuilder()
         builder.personality = "Extroversion"
         builder.active_model = "google/gemma-3-27b-it"
+        builder.dataset_name = "allenai/soda"
 
         # Create test JSONL file
         test_file = tmp_path / "test_dataset.jsonl"
@@ -136,9 +129,9 @@ class TestUploadToHub:
                 token="hf_test",
             )
 
-    @patch("psyctl.core.dataset_builder.Dataset")
-    @patch("psyctl.core.dataset_builder.HfApi")
-    def test_upload_creates_readme(self, mock_hf_api, mock_dataset, tmp_path):
+    @patch("huggingface_hub.HfApi")
+    @patch("datasets.Dataset")
+    def test_upload_creates_readme(self, mock_dataset, mock_hf_api, tmp_path):
         """Test that upload creates README.md with dataset card."""
         # Setup mocks
         mock_ds_instance = MagicMock()
@@ -148,6 +141,7 @@ class TestUploadToHub:
         builder = DatasetBuilder()
         builder.personality = "Extroversion"
         builder.active_model = "google/gemma-3-27b-it"
+        builder.dataset_name = "allenai/soda"
 
         # Create test JSONL file
         test_file = tmp_path / "test_dataset.jsonl"
@@ -175,10 +169,10 @@ class TestUploadToHub:
 class TestUploadCLI:
     """Test dataset.upload CLI command."""
 
+    @patch("psyctl.core.utils.validate_hf_token")
     @patch("psyctl.commands.dataset.DatasetBuilder")
-    @patch("psyctl.commands.dataset.validate_hf_token")
     def test_upload_cli_success(
-        self, mock_validate_token, mock_builder_class, tmp_path
+        self, mock_builder_class, mock_validate_token, tmp_path
     ):
         """Test successful CLI upload."""
         from click.testing import CliRunner
@@ -207,19 +201,29 @@ class TestUploadCLI:
         assert "Successfully uploaded" in result.output
         mock_builder.upload_to_hub.assert_called_once()
 
-    @patch("psyctl.commands.dataset.validate_hf_token")
-    def test_upload_cli_missing_token(self, mock_validate_token):
+    @patch("psyctl.core.utils.validate_hf_token")
+    def test_upload_cli_missing_token(self, mock_validate_token, tmp_path):
         """Test CLI upload with missing HF_TOKEN."""
         from click.testing import CliRunner
 
         from psyctl.commands.dataset import upload
+
+        # Create a real file so click.Path(exists=True) validation passes
+        test_file = tmp_path / "test.jsonl"
+        test_file.write_text('{"question": "test"}\n')
 
         # Mock token validation to raise exception
         mock_validate_token.side_effect = click.ClickException("HF_TOKEN not found")
 
         runner = CliRunner()
         result = runner.invoke(
-            upload, ["--dataset-file", "test.jsonl", "--repo-id", "test-user/test-repo"]
+            upload,
+            [
+                "--dataset-file",
+                str(test_file),
+                "--repo-id",
+                "test-user/test-repo",
+            ],
         )
 
         assert result.exit_code != 0

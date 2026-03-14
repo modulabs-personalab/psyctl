@@ -37,10 +37,20 @@ def mock_tokenizer():
     """Create a mock tokenizer."""
     tokenizer = MagicMock()
 
-    # Mock return value for tokenizer call
-    mock_output = MagicMock()
-    mock_output.input_ids = torch.tensor([[1, 2, 3, 4, 5]])
-    tokenizer.return_value = mock_output
+    # Mock return value for tokenizer call - return different lengths
+    # for question vs full prompt to ensure answer tokens exist
+    def tokenizer_side_effect(*args, **kwargs):
+        mock_output = MagicMock()
+        text = args[0] if args else kwargs.get("text", "")
+        if "Answer:" in str(text) or len(str(text)) > 30:
+            # Full prompt - longer
+            mock_output.input_ids = torch.tensor([[1, 2, 3, 4, 5, 6, 7, 8]])
+        else:
+            # Question prompt - shorter
+            mock_output.input_ids = torch.tensor([[1, 2, 3, 4, 5]])
+        return mock_output
+
+    tokenizer.side_effect = tokenizer_side_effect
 
     # Mock chat template attributes
     tokenizer.chat_template = None
@@ -106,19 +116,6 @@ class TestBiPOVectorExtractor:
                 epochs=1,
             )
 
-    def test_prepare_dataset(self, extractor, mock_dataset, mock_tokenizer):
-        """Test dataset preparation."""
-        samples = extractor._prepare_dataset(mock_dataset, mock_tokenizer)
-
-        assert len(samples) == 2
-        assert all(
-            len(sample) == 4 for sample in samples
-        )  # (situation, char_name, positive, neutral)
-        assert "party" in samples[0][0].lower()  # situation
-        assert samples[0][1] == "Alice"  # char_name
-        assert samples[0][2] == "I love parties and meeting new people!"  # positive
-        assert samples[0][3] == "Parties are okay."  # neutral
-
     def test_get_response_logprob_no_steering(
         self, extractor, mock_model, mock_tokenizer
     ):
@@ -128,9 +125,8 @@ class TestBiPOVectorExtractor:
         logprob = extractor._get_response_logprob(
             model=mock_model,
             tokenizer=mock_tokenizer,
-            situation="Test situation",
-            char_name="TestChar",
-            response="Test response",
+            question_prompt="How do you feel?",
+            full_prompt="How do you feel? Answer: I feel great!",
             layer_module=layer_module,
             steering=None,
         )
@@ -148,9 +144,8 @@ class TestBiPOVectorExtractor:
         logprob = extractor._get_response_logprob(
             model=mock_model,
             tokenizer=mock_tokenizer,
-            situation="Test situation",
-            char_name="TestChar",
-            response="Test response",
+            question_prompt="How do you feel?",
+            full_prompt="How do you feel? Answer: I feel great!",
             layer_module=layer_module,
             steering=steering_vec,
         )
@@ -182,9 +177,8 @@ class TestBiPOVectorExtractor:
         logprob = extractor._get_response_logprob(
             model=model,
             tokenizer=mock_tokenizer,
-            situation="Test situation",
-            char_name="TestChar",
-            response="Response",
+            question_prompt="How do you feel?",
+            full_prompt="How do you feel? Answer: Response text here",
             layer_module=layer_module,
             steering=steering_vec,
         )
@@ -197,13 +191,21 @@ class TestBiPOVectorExtractor:
         """Test BiPO loss computation (full text only)."""
         layer_module = MagicMock(spec=nn.Module)
         v = torch.randn(128, requires_grad=True)
-        batch = extractor._prepare_dataset(mock_dataset, mock_tokenizer)
+
+        # Build batch as list of (question_prompt, positive_full_prompt, neutral_full_prompt)
+        batch = [
+            (
+                "How do you feel about parties?",
+                "How do you feel about parties? Answer: I love parties!",
+                "How do you feel about parties? Answer: Parties are okay.",
+            )
+        ]
 
         loss = extractor._compute_bipo_loss(
             model=mock_model,
             tokenizer=mock_tokenizer,
             layer_module=layer_module,
-            batch=batch[:1],  # Single sample
+            batch=batch,
             v=v,
             beta=0.1,
         )
@@ -261,6 +263,7 @@ class TestBiPOVectorExtractor:
                 beta=0.1,
                 epochs=1,
                 weight_decay=0.01,
+                use_chat_template=True,
             )
 
             assert isinstance(steering_vec, torch.Tensor)
@@ -357,37 +360,3 @@ class TestBiPOVectorExtractor:
 
                 vec = vectors["test.layer"]
                 assert pytest.approx(vec.norm().item(), rel=1e-5) == 5.0
-
-    def test_format_with_chat_template_available(self, extractor):
-        """Test formatting with chat template when available."""
-        tokenizer = MagicMock()
-        tokenizer.chat_template = "template"
-        tokenizer.apply_chat_template = MagicMock(
-            return_value="<|user|>Test<|assistant|>"
-        )
-
-        result = extractor._format_with_chat_template(tokenizer, "Test")
-
-        assert result == "<|user|>Test<|assistant|>"
-        tokenizer.apply_chat_template.assert_called_once()
-
-    def test_format_with_chat_template_unavailable(self, extractor):
-        """Test formatting without chat template."""
-        tokenizer = MagicMock()
-        tokenizer.chat_template = None
-
-        result = extractor._format_with_chat_template(tokenizer, "Test")
-
-        assert result == "Test"
-
-    def test_format_with_chat_template_error(self, extractor):
-        """Test formatting when chat template raises error."""
-        tokenizer = MagicMock()
-        tokenizer.chat_template = "template"
-        tokenizer.apply_chat_template = MagicMock(
-            side_effect=Exception("Template error")
-        )
-
-        result = extractor._format_with_chat_template(tokenizer, "Test")
-
-        assert result == "Test"

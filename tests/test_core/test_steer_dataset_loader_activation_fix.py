@@ -65,11 +65,11 @@ class TestTokenPosition:
 
         # Last token should NOT be special tokens
         assert last_token_text not in ['\n', '<end_of_turn>', '<pad>'], \
-            f"Last token should be answer content, got: {repr(last_token_text)}"
+            f"Last token should be answer content, got: {last_token_text!r}"
 
         # Last token should be from answer selection (1 or 2)
         assert last_token_text.strip() in ['1', '2'], \
-            f"Last token should be '1' or '2', got: {repr(last_token_text)}"
+            f"Last token should be '1' or '2', got: {last_token_text!r}"
 
     def test_second_to_last_token(self, dataset, tokenizer_gemma):
         """
@@ -87,7 +87,7 @@ class TestTokenPosition:
 
         # Should be '(' before '1' or '2'
         assert second_last_token_text in ['(', '\n'], \
-            f"Second to last token unexpected: {repr(second_last_token_text)}"
+            f"Second to last token unexpected: {second_last_token_text!r}"
 
 
 class TestChatTemplateStructure:
@@ -242,7 +242,7 @@ You are Alice. What would your response be in this situation?
         analyzer_last = tokenizer_gemma.decode([tokens_analyzer['input_ids'][0][-1].item()])
 
         assert loader_last == analyzer_last, \
-            f"Last token mismatch: loader={repr(loader_last)}, analyzer={repr(analyzer_last)}"
+            f"Last token mismatch: loader={loader_last!r}, analyzer={analyzer_last!r}"
 
 
 class TestMultiModel:
@@ -370,10 +370,10 @@ class TestActivationExtraction:
 
             # Should be answer content, not special token
             assert last_token_text not in ['\n', '<end_of_turn>', '<pad>'], \
-                f"Sample {i}: Last real token is special token: {repr(last_token_text)}"
+                f"Sample {i}: Last real token is special token: {last_token_text!r}"
 
             assert last_token_text.strip() in ['1', '2'], \
-                f"Sample {i}: Last real token should be answer: {repr(last_token_text)}"
+                f"Sample {i}: Last real token should be answer: {last_token_text!r}"
 
 
 class TestRegression:

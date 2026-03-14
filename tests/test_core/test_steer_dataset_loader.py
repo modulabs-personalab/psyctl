@@ -92,6 +92,7 @@ def test_create_prompts_index_format(dataset_file, tokenizer):
 
     logger.success("Index format prompt creation test passed")
 
+
 def test_create_prompts_index_format_without_chat_template(dataset_file, tokenizer):
     """Test creating prompts with index format (CAA style) without chat template."""
     logger.info("Testing create_prompts() with index format without chat template")
@@ -114,8 +115,9 @@ def test_create_prompts_index_format_without_chat_template(dataset_file, tokeniz
     assert "(1" in pos_prompts[0]  # Should select index 1
     assert "<bos>" not in pos_prompts[0]  # Should have special token <bos>
     assert "<start_of_turn>model" not in pos_prompts[0]  # Should have special token <start_of_turn>model
-    
+
     logger.success("Index format prompt creation test passed")
+
 
 def test_create_prompts_direct_format(dataset_file, tokenizer):
     """Test creating prompts with direct format (BiPO style)."""
@@ -125,7 +127,7 @@ def test_create_prompts_direct_format(dataset_file, tokenizer):
     dataset = loader.load(dataset_file)
 
     pos_prompts, neu_prompts = loader.create_prompts(
-        dataset, tokenizer, format_type="direct", 
+        dataset, tokenizer, format_type="direct",
         use_chat_template=True
     )
 
@@ -143,6 +145,7 @@ def test_create_prompts_direct_format(dataset_file, tokenizer):
 
     logger.success("Direct format prompt creation test passed")
 
+
 def test_create_prompts_direct_format_without_chat_template(dataset_file, tokenizer):
     """Test creating prompts with direct format (BiPO style) without chat template."""
     logger.info("Testing create_prompts() with direct format without chat template")
@@ -151,7 +154,7 @@ def test_create_prompts_direct_format_without_chat_template(dataset_file, tokeni
     dataset = loader.load(dataset_file)
 
     pos_prompts, neu_prompts = loader.create_prompts(
-        dataset, tokenizer, format_type="direct", 
+        dataset, tokenizer, format_type="direct",
         use_chat_template=False
     )
 
@@ -160,7 +163,7 @@ def test_create_prompts_direct_format_without_chat_template(dataset_file, tokeni
 
     assert "<bos>" not in pos_prompts[0]  # Should have special token <bos>
     assert "<start_of_turn>model" not in pos_prompts[0]  # Should have special token <start_of_turn>model
-    
+
     logger.success("Direct format prompt creation test without chat template passed")
 
 
