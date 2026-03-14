@@ -141,6 +141,10 @@ cython_debug/
 # VS Code
 .vscode/
 
+# Notebook development files
+jupyter_example.md
+psyctl_example.ipynb
+
 # Project specific
 dataset/
 steering_vector/

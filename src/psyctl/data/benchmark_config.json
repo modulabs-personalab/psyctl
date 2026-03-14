@@ -299,6 +299,57 @@
         ],
         "reverse_keyed": "Items marked as 'minus' keyed are reverse scored (6 - response). Higher scores indicate stronger tendency."
       }
+    },
+    "sd4": {
+      "name": "SD4",
+      "description": "Short Dark Tetrad (28 items) - Dark personality traits",
+      "version": "28",
+      "language": "en",
+      "num_questions": 28,
+      "data_file": "sd4_28_items_en.json",
+      "source": "Paulhus, D. L., Buckels, E. E., Trapnell, P. D., & Jones, D. N. (2021). European Journal of Psychological Assessment, 37(3), 208-222.",
+      "license": "Academic",
+      "domains": {
+        "M": {
+          "name": "Machiavellianism",
+          "num_items": 7,
+          "population_mean": 3.62,
+          "population_std": 0.65,
+          "description": "Manipulative and strategic thinking"
+        },
+        "N": {
+          "name": "Narcissism",
+          "num_items": 7,
+          "population_mean": 3.16,
+          "population_std": 0.67,
+          "description": "Grandiosity and self-centeredness"
+        },
+        "P": {
+          "name": "Psychopathy",
+          "num_items": 7,
+          "population_mean": 2.14,
+          "population_std": 0.76,
+          "description": "Impulsivity and lack of empathy"
+        },
+        "S": {
+          "name": "Sadism",
+          "num_items": 7,
+          "population_mean": 2.88,
+          "population_std": 0.81,
+          "description": "Enjoyment of cruelty and aggression"
+        }
+      },
+      "scoring": {
+        "scale": [1, 2, 3, 4, 5],
+        "labels": [
+          "Strongly disagree",
+          "Disagree",
+          "Neither agree nor disagree",
+          "Agree",
+          "Strongly agree"
+        ],
+        "reverse_keyed": "All items are forward scored. Higher scores indicate stronger dark personality traits."
+      }
     }
   },
 

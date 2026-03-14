@@ -1,0 +1,422 @@
+[
+  {
+    "id": "sd4-001",
+    "text": "It's not wise to let people know your secrets.",
+    "keyed": "plus",
+    "domain": "M",
+    "facet": null,
+    "num": 1,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-002",
+    "text": "People see me as a natural leader.",
+    "keyed": "plus",
+    "domain": "N",
+    "facet": null,
+    "num": 2,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-003",
+    "text": "People often say I'm out of control.",
+    "keyed": "plus",
+    "domain": "P",
+    "facet": null,
+    "num": 3,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-004",
+    "text": "Watching a fist-fight excites me.",
+    "keyed": "plus",
+    "domain": "S",
+    "facet": null,
+    "num": 4,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-005",
+    "text": "Whatever it takes, you must get the important people on your side.",
+    "keyed": "plus",
+    "domain": "M",
+    "facet": null,
+    "num": 5,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-006",
+    "text": "I tend to fight against authorities and their rules.",
+    "keyed": "plus",
+    "domain": "P",
+    "facet": null,
+    "num": 6,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-007",
+    "text": "I have a unique talent for persuading people.",
+    "keyed": "plus",
+    "domain": "N",
+    "facet": null,
+    "num": 7,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-008",
+    "text": "I really enjoy violent films and video games.",
+    "keyed": "plus",
+    "domain": "S",
+    "facet": null,
+    "num": 8,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-009",
+    "text": "Group activities tend to be dull without me.",
+    "keyed": "plus",
+    "domain": "N",
+    "facet": null,
+    "num": 9,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-010",
+    "text": "I've been in more fights than most people of my age and gender.",
+    "keyed": "plus",
+    "domain": "P",
+    "facet": null,
+    "num": 10,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-011",
+    "text": "It's funny when idiots fall flat on their face.",
+    "keyed": "plus",
+    "domain": "S",
+    "facet": null,
+    "num": 11,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-012",
+    "text": "Avoid direct conflict with others because they may be useful in the future.",
+    "keyed": "plus",
+    "domain": "M",
+    "facet": null,
+    "num": 12,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-013",
+    "text": "I tend to dive in, then ask questions later.",
+    "keyed": "plus",
+    "domain": "P",
+    "facet": null,
+    "num": 13,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-014",
+    "text": "Keep a low profile if you want to get your way.",
+    "keyed": "plus",
+    "domain": "M",
+    "facet": null,
+    "num": 14,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-015",
+    "text": "I know that I am special because people keep telling me so.",
+    "keyed": "plus",
+    "domain": "N",
+    "facet": null,
+    "num": 15,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-016",
+    "text": "I enjoy watching violent sports.",
+    "keyed": "plus",
+    "domain": "S",
+    "facet": null,
+    "num": 16,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-017",
+    "text": "Manipulating the situation takes planning.",
+    "keyed": "plus",
+    "domain": "M",
+    "facet": null,
+    "num": 17,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-018",
+    "text": "I have some exceptional qualities.",
+    "keyed": "plus",
+    "domain": "N",
+    "facet": null,
+    "num": 18,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-019",
+    "text": "I've been in trouble with the law.",
+    "keyed": "plus",
+    "domain": "P",
+    "facet": null,
+    "num": 19,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-020",
+    "text": "Some people deserve to suffer.",
+    "keyed": "plus",
+    "domain": "S",
+    "facet": null,
+    "num": 20,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-021",
+    "text": "I'm likely to become a future star in some area.",
+    "keyed": "plus",
+    "domain": "N",
+    "facet": null,
+    "num": 21,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-022",
+    "text": "I sometimes get into dangerous situations.",
+    "keyed": "plus",
+    "domain": "P",
+    "facet": null,
+    "num": 22,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-023",
+    "text": "Flattery is a good way to get people on your side.",
+    "keyed": "plus",
+    "domain": "M",
+    "facet": null,
+    "num": 23,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-024",
+    "text": "Just for kicks, I've said mean things on social media.",
+    "keyed": "plus",
+    "domain": "S",
+    "facet": null,
+    "num": 24,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-025",
+    "text": "I love it when a tricky plan succeeds.",
+    "keyed": "plus",
+    "domain": "M",
+    "facet": null,
+    "num": 25,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-026",
+    "text": "I like to show off every now and then.",
+    "keyed": "plus",
+    "domain": "N",
+    "facet": null,
+    "num": 26,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-027",
+    "text": "People who mess with me always regret it.",
+    "keyed": "plus",
+    "domain": "P",
+    "facet": null,
+    "num": 27,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  },
+  {
+    "id": "sd4-028",
+    "text": "I know how to hurt someone with words alone.",
+    "keyed": "plus",
+    "domain": "S",
+    "facet": null,
+    "num": 28,
+    "choices": [
+      {"text": "Strongly disagree", "score": 1},
+      {"text": "Disagree", "score": 2},
+      {"text": "Neither agree nor disagree", "score": 3},
+      {"text": "Agree", "score": 4},
+      {"text": "Strongly agree", "score": 5}
+    ]
+  }
+]

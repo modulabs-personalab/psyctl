@@ -13,6 +13,20 @@ from psyctl.core.logger import get_logger
 torch._dynamo.config.suppress_errors = True
 torch._dynamo.config.disable = True
 
+# Compatibility patch: some models (e.g. EXAONE) use ALL_ATTENTION_FUNCTIONS.get_interface()
+# which was added to AttentionInterface in a newer transformers release. Patch it in if missing.
+try:
+    from transformers.modeling_utils import AttentionInterface
+
+    if not hasattr(AttentionInterface, "get_interface"):
+
+        def _get_interface(self: Any, name: str, default: Any = None) -> Any:
+            return self.get(name, default)
+
+        AttentionInterface.get_interface = _get_interface  # type: ignore[attr-defined]
+except (ImportError, AttributeError):
+    pass
+
 
 class LLMLoader:
     """Load and manage LLM models."""
