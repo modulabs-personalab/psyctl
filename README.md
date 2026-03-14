@@ -208,24 +208,18 @@ psyctl benchmark llm-as-judge \
   --strengths "1.0,2.0,3.0"
 ```
 
-**More Examples:**
-- See [examples/](examples/) directory for Python library usage
-- Check documentation links above for detailed guides
+**Notebooks (Google Colab):**
 
----
+Open any notebook directly in Colab — no local setup required:
 
-## PoC Notebooks (Google Colab)
-
-Try psyctl directly in your browser with these Colab notebooks:
-
-| Notebook | Description |
-|----------|-------------|
-| [Steering Gemma-3-4b-it With PsyCtl](https://colab.research.google.com/drive/1h84G02UYAgJ_GSm_1mhnerpK_HhMzO46) | End-to-end steering workflow: layer analysis, BiPO extraction, and text generation |
-| [PsyCtl로 Gemma-3-4b-it 성격 조향하기 (Korean)](https://colab.research.google.com/drive/12x92LqwshlDlxH9xn1JkeZTK7JkdTvzJ) | Same workflow in Korean |
-| [Steering Gemma-3-270m-it With PsyCtl](https://colab.research.google.com/drive/1TJCXjwuYd_IRghpg-uKQc1T4eDNkKdrl) | Lightweight version using 270M model for quick testing |
-| [CAA Extraction (Incremental Mean)](https://colab.research.google.com/drive/1uAFDbxjUXJKuH8CbdDZtGki74aFNajxz) | Manual CAA vector extraction with memory-efficient incremental mean |
-| [BiPO PoC](https://colab.research.google.com/drive/1mK5_VXb8AWX9NzOe93BRSUJDoRbQWh5y) | BiPO algorithm proof-of-concept with distilgpt2 |
-| [Build CAA Dataset by P2](https://colab.research.google.com/drive/1AG2sqixvNTZWKCGYqEquPRhPCreA3hdo) | Dataset generation using P2 personality prompting |
+| Notebook | Description | Time |
+|----------|-------------|------|
+| [01_quickstart](./examples/en/01_quickstart.ipynb) | Instant personality steering with pre-trained vectors | ~5 min |
+| [02_measure_personality](./examples/en/02_measure_personality.ipynb) | Measure personality with IPIP-NEO-120 inventory | ~8 min |
+| [03_generate_dataset](./examples/en/03_generate_dataset.ipynb) | Generate your own steering dataset | ~5 min |
+| [04_extract_vector](./examples/en/04_extract_vector.ipynb) | Extract vectors with mean_diff, denoised, and BiPO | ~10 min |
+| [05_layer_analysis](./examples/en/05_layer_analysis.ipynb) | Find optimal steering layers with SVM analysis | ~10 min |
+| [06_benchmark_vectors](./examples/en/06_benchmark_vectors.ipynb) | Benchmark vectors with IPIP-NEO-120 inventory | ~15 min |
 
 > **Note**: These notebooks require a HuggingFace token (set as `HF_TOKEN` in Colab secrets). GPU runtime (T4 or higher) is recommended.
 
