@@ -1,0 +1,65 @@
+docs_dir: site-docs
+site_name: PSYCTL
+site_description: LLM Personality Steering with Psychology
+site_url: https://modulabs-personalab.github.io/psyctl/
+repo_url: https://github.com/modulabs-personalab/psyctl
+repo_name: modulabs-personalab/psyctl
+
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  palette:
+    scheme: slate
+    primary: deep purple
+    accent: amber
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+  - Guides:
+    - Build Steering Dataset: guides/dataset.md
+    - Extract Steering Vectors: guides/extraction.md
+    - Apply Steering: guides/steering.md
+    - Benchmark: guides/benchmark.md
+    - Layer Analysis: guides/layer-analysis.md
+    - OpenRouter Integration: guides/openrouter.md
+  - Notebooks: notebooks/index.md
+  - Community:
+    - Hub: community/index.md
+    - Share Your Work: community/share.md
+  - Reference:
+    - Configuration: reference/configuration.md
+    - Supported Inventories: reference/inventories.md
+    - Adding Inventories: reference/adding-inventories.md
+    - Troubleshooting: reference/troubleshooting.md
+    - Contributing: contributing.md
