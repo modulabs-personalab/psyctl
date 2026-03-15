@@ -13,6 +13,7 @@ theme:
     scheme: slate
     primary: deep purple
     accent: amber
+  custom_dir: site-docs/overrides
   features:
     - navigation.instant
     - navigation.tabs
