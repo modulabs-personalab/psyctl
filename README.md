@@ -4,6 +4,8 @@
 
 # PSYCTL - LLM Personality Steering Tool
 
+**English** | [한국어](./README-KO.md)
+
 > **⚠️ Project Under Development**
 > This project is currently under development and only supports limited functionality. Please check the release notes for stable features.
 
