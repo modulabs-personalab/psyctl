@@ -212,6 +212,8 @@ psyctl benchmark llm-as-judge \
 
 Open any notebook directly in Colab — no local setup required:
 
+**English:**
+
 | Notebook | Description | Time |
 |----------|-------------|------|
 | [01_quickstart](./examples/en/01_quickstart.ipynb) | Instant personality steering with pre-trained vectors | ~5 min |
@@ -220,6 +222,17 @@ Open any notebook directly in Colab — no local setup required:
 | [04_extract_vector](./examples/en/04_extract_vector.ipynb) | Extract vectors with mean_diff, denoised, and BiPO | ~10 min |
 | [05_layer_analysis](./examples/en/05_layer_analysis.ipynb) | Find optimal steering layers with SVM analysis | ~10 min |
 | [06_benchmark_vectors](./examples/en/06_benchmark_vectors.ipynb) | Benchmark vectors with IPIP-NEO-120 inventory | ~15 min |
+
+**Korean (한국어):**
+
+| 노트북 | 설명 | 소요 시간 |
+|--------|------|----------|
+| [01_quickstart](./examples/ko/01_quickstart.ipynb) | 사전학습 벡터로 성격 즉시 조향 | ~5분 |
+| [02_measure_personality](./examples/ko/02_measure_personality.ipynb) | IPIP-NEO-120 심리 검사로 성격 측정 | ~8분 |
+| [03_generate_dataset](./examples/ko/03_generate_dataset.ipynb) | 나만의 스티어링 데이터셋 생성 | ~5분 |
+| [04_extract_vector](./examples/ko/04_extract_vector.ipynb) | mean_diff, denoised, BiPO 벡터 추출 | ~10분 |
+| [05_layer_analysis](./examples/ko/05_layer_analysis.ipynb) | SVM 분석으로 최적 스티어링 레이어 탐색 | ~10분 |
+| [06_benchmark_vectors](./examples/ko/06_benchmark_vectors.ipynb) | IPIP-NEO-120 인벤토리 벤치마크 | ~15분 |
 
 > **Note**: These notebooks require a HuggingFace token (set as `HF_TOKEN` in Colab secrets). GPU runtime (T4 or higher) is recommended.
 
