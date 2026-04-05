@@ -44,8 +44,8 @@ def get_env(key: str, default: None, cast_type: type[Path]) -> Path | None: ...
 # Implementation
 def get_env(key: str, default=None, cast_type: type = str):
     """Get environment variable with type casting."""
-    value = os.getenv(key, default)
-    if value is None or value == default:
+    value = os.getenv(key)
+    if value is None:
         return default
     if cast_type is bool:
         return value.lower() in ("true", "1", "yes", "on")

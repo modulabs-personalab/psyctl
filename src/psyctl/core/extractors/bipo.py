@@ -94,44 +94,52 @@ class BiPOVectorExtractor(BaseVectorExtractor):
         self._validate_layers(model, layers)
         dataset = self._load_dataset(dataset, dataset_path)
 
-        # 3. Freeze model parameters
+        # 3. Freeze model parameters (save original state for restoration)
+        original_requires_grad = {
+            name: p.requires_grad for name, p in model.named_parameters()
+        }
         for param in model.parameters():
             param.requires_grad = False
 
         # 4. Extract vectors for each layer
         steering_vectors = {}
 
-        for layer_idx, layer_str in enumerate(layers, 1):
-            self.logger.info(f"\n{'=' * 80}")
-            self.logger.info(
-                f"Training steering vector for layer [{layer_idx}/{len(layers)}]: {layer_str}"
-            )
-            self.logger.info(f"{'=' * 80}")
+        try:
+            for layer_idx, layer_str in enumerate(layers, 1):
+                self.logger.info(f"\n{'=' * 80}")
+                self.logger.info(
+                    f"Training steering vector for layer [{layer_idx}/{len(layers)}]: {layer_str}"
+                )
+                self.logger.info(f"{'=' * 80}")
 
-            layer_module = self.layer_accessor.get_layer(model, layer_str)
-            steering_vec = self._train_steering_vector(
-                model=model,
-                tokenizer=tokenizer,
-                layer_module=layer_module,
-                layer_str=layer_str,
-                layer_idx=layer_idx,
-                total_layers=len(layers),
-                dataset=dataset,
-                batch_size=batch_size,
-                lr=lr,
-                beta=beta,
-                epochs=epochs,
-                weight_decay=weight_decay,
-                use_chat_template=use_chat_template,
-            )
+                layer_module = self.layer_accessor.get_layer(model, layer_str)
+                steering_vec = self._train_steering_vector(
+                    model=model,
+                    tokenizer=tokenizer,
+                    layer_module=layer_module,
+                    layer_str=layer_str,
+                    layer_idx=layer_idx,
+                    total_layers=len(layers),
+                    dataset=dataset,
+                    batch_size=batch_size,
+                    lr=lr,
+                    beta=beta,
+                    epochs=epochs,
+                    weight_decay=weight_decay,
+                    use_chat_template=use_chat_template,
+                )
 
-            steering_vectors[layer_str] = steering_vec
+                steering_vectors[layer_str] = steering_vec
 
-            self.logger.info(
-                f"Completed layer [{layer_idx}/{len(layers)}] '{layer_str}': "
-                f"shape={steering_vec.shape}, norm={steering_vec.norm():.4f}"
-            )
-            self.logger.info(f"{'=' * 80}\n")
+                self.logger.info(
+                    f"Completed layer [{layer_idx}/{len(layers)}] '{layer_str}': "
+                    f"shape={steering_vec.shape}, norm={steering_vec.norm():.4f}"
+                )
+                self.logger.info(f"{'=' * 80}\n")
+        finally:
+            # Restore original requires_grad state
+            for name, p in model.named_parameters():
+                p.requires_grad = original_requires_grad.get(name, True)
 
         self.logger.info(
             f"Successfully extracted {len(steering_vectors)} steering vectors"
@@ -429,16 +437,16 @@ class BiPOVectorExtractor(BaseVectorExtractor):
             #   log P(token_i | context_{<i})
             # where context_{<i} includes all tokens up to (but not including) position i
             log_probs = F.log_softmax(logits, dim=-1)
-            total_logprob = torch.tensor(0.0, device=input_ids.device)
 
-            # Loop through answer token positions only
-            # Start from question_len (first answer token position)
-            # End at input_ids.size(1) (total sequence length)
-            for i in range(question_len, input_ids.size(1)):
-                current_token = input_ids[0, i]
-                # log_probs[0, i-1, :] contains P(token | context up to position i-1)
-                # We want P(token at position i | context up to position i-1)
-                total_logprob = total_logprob + log_probs[0, i - 1, current_token]
+            # Vectorized: gather log probs for answer tokens
+            # log_probs[0, i-1, :] contains P(token | context up to position i-1)
+            answer_tokens = input_ids[0, question_len:]  # [answer_len]
+            answer_log_probs = log_probs[
+                0, question_len - 1 : input_ids.size(1) - 1, :
+            ]  # [answer_len, vocab]
+            total_logprob = answer_log_probs.gather(
+                -1, answer_tokens.unsqueeze(-1)
+            ).sum()
 
             return total_logprob
 

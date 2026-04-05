@@ -398,8 +398,8 @@ class SteerDatasetLoader:
                 )
                 prompt = prompt + answer
             else:
-                prompt = question
-            return prompt + answer
+                prompt = question + answer
+            return prompt
         except Exception as e:
             self.logger.debug(f"Chat template failed, using raw text: {e}")
             return question + answer

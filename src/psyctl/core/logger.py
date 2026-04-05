@@ -60,10 +60,6 @@ def setup_logging():
 
 def get_logger(name: str | None = None) -> CustomLogger:
     """Get logger instance."""
-    # Ensure CustomLogger class is set
     logging.setLoggerClass(CustomLogger)
     logger = logging.getLogger(name or __name__)
-    # Reset to default to not affect other loggers
-    logging.setLoggerClass(logging.Logger)
-    # Cast to CustomLogger since we set the class above
     return cast("CustomLogger", logger)

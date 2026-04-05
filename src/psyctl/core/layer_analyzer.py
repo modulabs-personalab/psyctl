@@ -11,7 +11,6 @@ from tqdm.auto import tqdm
 from transformers import AutoTokenizer
 
 from psyctl.core.analyzers import ConsensusAnalyzer, SVMAnalyzer
-from psyctl.core.hook_manager import ActivationHookManager
 from psyctl.core.layer_accessor import LayerAccessor
 from psyctl.core.logger import get_logger
 from psyctl.core.steer_dataset_loader import SteerDatasetLoader
@@ -197,8 +196,8 @@ class LayerAnalyzer:
             output_path.parent.mkdir(parents=True, exist_ok=True)
             import json
 
-            with Path(output_path).open("w") as f:
-                json.dump(output_data, f, indent=2)
+            with Path(output_path).open("w", encoding="utf-8") as f:
+                json.dump(output_data, f, indent=2, ensure_ascii=False)
 
             self.logger.info(f"Results saved to {output_path}")
         else:
@@ -375,98 +374,3 @@ class LayerAnalyzer:
 
         return layer_activations
 
-    def _analyze_single_layer(
-        self,
-        model: nn.Module,
-        tokenizer: AutoTokenizer,
-        layer_path: str,
-        dataset: list[dict],
-        analyzer,
-        batch_size: int | None = None,
-    ) -> dict[str, float]:
-        """
-        Analyze a single layer.
-
-        Args:
-            model: Model
-            tokenizer: Tokenizer
-            layer_path: Layer path
-            dataset: Dataset
-            analyzer: Analyzer instance
-            batch_size: Batch size
-
-        Returns:
-            Dictionary with metrics
-        """
-        if batch_size is None:
-            batch_size = 16
-
-        # Get layer module
-        layer_module = self.layer_accessor.get_layer(model, layer_path)
-
-        positive_activations = []
-        neutral_activations = []
-        model.eval()
-
-        # Collect positive activations (sample by sample for SVM)
-        for item in dataset:
-            hook_manager = ActivationHookManager()
-            hook_manager.register_hooks({"positive": layer_module})
-
-            # Get situation/question field
-            situation = item.get("situation", item.get("question", ""))
-
-            prompt = (
-                tokenizer.apply_chat_template(  # type: ignore[call-arg]
-                    [{"role": "user", "content": situation}],
-                    tokenize=False,
-                    add_generation_prompt=True,
-                )
-                + item["positive"]
-            )
-
-            inputs = tokenizer(  # type: ignore[call-arg]
-                [prompt], return_tensors="pt", padding=True, truncation=True
-            ).to(model.device)
-
-            with torch.inference_mode():
-                hook_manager.set_attention_mask(inputs["attention_mask"])
-                _ = model(**inputs)
-
-            mean_acts = hook_manager.get_mean_activations()
-            positive_activations.append(mean_acts["positive"])
-            hook_manager.remove_all_hooks()
-
-        # Collect neutral activations
-        for item in dataset:
-            hook_manager = ActivationHookManager()
-            hook_manager.register_hooks({"neutral": layer_module})
-
-            # Get situation/question field
-            situation = item.get("situation", item.get("question", ""))
-
-            prompt = (
-                tokenizer.apply_chat_template(  # type: ignore[call-arg]
-                    [{"role": "user", "content": situation}],
-                    tokenize=False,
-                    add_generation_prompt=True,
-                )
-                + item["neutral"]
-            )
-
-            inputs = tokenizer(  # type: ignore[call-arg]
-                [prompt], return_tensors="pt", padding=True, truncation=True
-            ).to(model.device)
-
-            with torch.inference_mode():
-                hook_manager.set_attention_mask(inputs["attention_mask"])
-                _ = model(**inputs)
-
-            mean_acts = hook_manager.get_mean_activations()
-            neutral_activations.append(mean_acts["neutral"])
-            hook_manager.remove_all_hooks()
-
-        # Analyze
-        metrics = analyzer.analyze(positive_activations, neutral_activations)
-
-        return metrics

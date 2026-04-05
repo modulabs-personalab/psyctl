@@ -24,12 +24,21 @@ from __future__ import annotations
 
 import html
 import json
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
 
 from psyctl.core.logger import get_logger
+
+
+class OpenRouterAPIError(Exception):
+    """Raised when the OpenRouter API returns an error response."""
+
+
+class OpenRouterTimeoutError(OpenRouterAPIError):
+    """Raised when an OpenRouter API request times out."""
 
 
 class OpenRouterClient:
@@ -64,6 +73,7 @@ class OpenRouterClient:
         self.logger = get_logger("openrouter_client")
         self.total_requests = 0
         self.total_cost = 0.0
+        self._lock = threading.Lock()
 
         self.logger.info("OpenRouter client initialized")
 
@@ -142,7 +152,7 @@ class OpenRouterClient:
             if response.status_code != 200:
                 error_msg = f"API Error: {response.status_code} - {response.text}"
                 self.logger.error(error_msg)
-                raise Exception(error_msg)
+                raise OpenRouterAPIError(error_msg)
 
             result = response.json()
             self.logger.debug(
@@ -169,7 +179,8 @@ class OpenRouterClient:
                     f"HTML entities still present after unescape: {generated_text[:100]}..."
                 )
 
-            self.total_requests += 1
+            with self._lock:
+                self.total_requests += 1
             self.logger.debug(
                 f"Generated response (ID: {generation_id}): {generated_text}"
             )
@@ -178,13 +189,15 @@ class OpenRouterClient:
 
         except requests.exceptions.Timeout:
             self.logger.error("Request timeout")
-            raise Exception("OpenRouter API request timeout") from None
+            raise OpenRouterTimeoutError("OpenRouter API request timeout") from None
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Request failed: {e}")
-            raise Exception(f"OpenRouter API request failed: {e}") from e
+            raise OpenRouterAPIError(f"OpenRouter API request failed: {e}") from e
         except KeyError as e:
             self.logger.error(f"Unexpected response format: {e}")
-            raise Exception(f"Unexpected OpenRouter API response: {e}") from e
+            raise OpenRouterAPIError(
+                f"Unexpected OpenRouter API response: {e}"
+            ) from e
 
     def generate_batch(
         self,
@@ -333,7 +346,8 @@ class OpenRouterClient:
 
             if response.status_code == 200:
                 cost = response.json()["data"]["total_cost"]
-                self.total_cost += cost
+                with self._lock:
+                    self.total_cost += cost
                 return cost
             else:
                 self.logger.warning(f"Failed to get cost for {generation_id}")
@@ -350,7 +364,8 @@ class OpenRouterClient:
         Returns:
             float: Total cost in USD
         """
-        return self.total_cost
+        with self._lock:
+            return self.total_cost
 
     def get_total_requests(self) -> int:
         """
@@ -359,7 +374,8 @@ class OpenRouterClient:
         Returns:
             int: Number of requests
         """
-        return self.total_requests
+        with self._lock:
+            return self.total_requests
 
 
 # Example usage

@@ -25,7 +25,7 @@ class TestValidateHfToken:
         monkeypatch.delenv("HF_TOKEN", raising=False)
         from psyctl.core.utils import validate_hf_token
 
-        with pytest.raises(click.ClickException) as exc_info:
+        with pytest.raises(ValueError) as exc_info:
             validate_hf_token()
 
         assert "HF_TOKEN environment variable is required" in str(exc_info.value)

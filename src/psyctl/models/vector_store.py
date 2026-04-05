@@ -135,8 +135,12 @@ class VectorStore:
 
             # Load vector and metadata
             tensors = load_file(filepath)
-            metadata = tensors.get("metadata", {})
             vector = tensors["steering_vector"]
+
+            from safetensors import safe_open
+
+            with safe_open(filepath, framework="pt") as f:
+                metadata = f.metadata() or {}
 
             self.logger.debug(f"Loaded vector shape: {vector.shape}")
             self.logger.debug(f"Loaded metadata: {metadata}")
@@ -188,13 +192,22 @@ class VectorStore:
                     # Parse layer_names if it's a string representation of a list
                     if "layer_names" in metadata_str:
                         try:
-                            import ast
+                            import json as _json
 
-                            metadata_str["layer_names"] = ast.literal_eval(
+                            metadata_str["layer_names"] = _json.loads(
                                 metadata_str["layer_names"]
                             )
-                        except Exception:
-                            pass
+                        except (ValueError, TypeError):
+                            import ast
+
+                            try:
+                                metadata_str["layer_names"] = ast.literal_eval(
+                                    metadata_str["layer_names"]
+                                )
+                            except (ValueError, SyntaxError):
+                                self.logger.warning(
+                                    f"Failed to parse layer_names: {metadata_str['layer_names']}"
+                                )
                     metadata = metadata_str
 
             # Reconstruct vectors dictionary
@@ -202,13 +215,20 @@ class VectorStore:
             layer_names = metadata.get("layer_names", [])
 
             if isinstance(layer_names, str):
-                # Try to parse as list
-                import ast
+                import json as _json
 
                 try:
-                    layer_names = ast.literal_eval(layer_names)
-                except Exception:
-                    layer_names = []
+                    layer_names = _json.loads(layer_names)
+                except (ValueError, TypeError):
+                    import ast
+
+                    try:
+                        layer_names = ast.literal_eval(layer_names)
+                    except (ValueError, SyntaxError):
+                        self.logger.warning(
+                            f"Failed to parse layer_names string: {layer_names}"
+                        )
+                        layer_names = []
 
             for idx, layer_name in enumerate(layer_names):
                 tensor_key = f"layer_{idx}"

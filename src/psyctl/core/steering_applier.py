@@ -177,9 +177,9 @@ class SteeringApplier:
                         use_cache=False,  # Required when using hooks
                     )
 
-                # 6. Decode and return
-                result = tokenizer.decode(output_ids[0], skip_special_tokens=True)  # type: ignore[call-arg]
-                generated_text = result.replace(prompt, "").strip()
+                # 6. Decode only newly generated tokens
+                generated_ids = output_ids[0][prompt_length:]
+                generated_text = tokenizer.decode(generated_ids, skip_special_tokens=True).strip()  # type: ignore[call-arg]
 
                 self.logger.success("Text generation completed successfully")
                 return generated_text

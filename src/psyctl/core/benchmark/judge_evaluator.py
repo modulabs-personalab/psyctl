@@ -269,7 +269,8 @@ Score: """
                 # Free up GPU memory
                 del self.judge_model
                 del self.judge_tokenizer
-                torch.cuda.empty_cache()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
                 logger.info("Cleaned up local judge model")
             else:
                 logger.info("Not cleaning up reused model")

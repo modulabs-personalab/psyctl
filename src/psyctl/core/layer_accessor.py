@@ -248,11 +248,11 @@ class LayerAccessor:
         if bracket_info:
             # Split pattern by bracket positions
             components = []
-            temp_pattern = pattern
+            prev_end = 0
 
             for start, end, content in bracket_info:
                 # Get the part before the bracket
-                before = temp_pattern[:start]
+                before = pattern[prev_end:start]
                 if before:
                     # Split by dots and add to components
                     components.extend(part for part in before.split(".") if part)
@@ -260,8 +260,10 @@ class LayerAccessor:
                 # Add the bracket content as a component
                 components.append(f"[{content}]")
 
-                # Update temp_pattern to continue from after this bracket
-                temp_pattern = temp_pattern[end:]
+                prev_end = end
+
+            # Add any remaining parts after the last bracket
+            temp_pattern = pattern[prev_end:]
 
             # Add any remaining parts after the last bracket
             if temp_pattern:

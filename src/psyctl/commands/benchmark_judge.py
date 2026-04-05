@@ -138,7 +138,7 @@ def llm_as_judge(
     # Load questions if provided
     questions_list = None
     if questions:
-        with open(questions) as f:
+        with open(questions, encoding="utf-8") as f:
             questions_data = json.load(f)
             if isinstance(questions_data, list):
                 questions_list = questions_data

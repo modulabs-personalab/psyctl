@@ -186,9 +186,9 @@ def upload(
         token = validate_hf_token()
         masked_token = f"{token[:4]}...{token[-4:]}" if len(token) > 8 else "***"
         logger.info(f"HF_TOKEN found: {masked_token}")
-    except click.ClickException as e:
-        console.print(f"[red]{e.message}[/red]")
-        raise
+    except ValueError as e:
+        console.print(f"[red]{e}[/red]")
+        raise click.ClickException(str(e)) from e
 
     console.print(f"Dataset File: {dataset_file}")
     console.print(f"Repository: {repo_id}")

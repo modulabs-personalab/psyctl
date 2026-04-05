@@ -5,10 +5,6 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from psyctl.core.logger import get_logger
 
-# Disable PyTorch compiler to avoid Triton issues
-torch._dynamo.config.suppress_errors = True
-torch._dynamo.config.disable = True
-
 
 class P2:
     """

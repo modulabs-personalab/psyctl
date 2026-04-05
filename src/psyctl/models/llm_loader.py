@@ -9,10 +9,6 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from psyctl.core.logger import get_logger
 
-# Disable PyTorch compiler to avoid Triton issues
-torch._dynamo.config.suppress_errors = True
-torch._dynamo.config.disable = True
-
 
 class LLMLoader:
     """Load and manage LLM models."""
@@ -23,8 +19,12 @@ class LLMLoader:
         self.logger = get_logger("llm_loader")
 
     def load_model(
-        self, model_name: str, device: str | None = None, dtype: str | None = None
-    ) -> tuple:
+        self,
+        model_name: str,
+        device: str | None = None,
+        dtype: str | None = None,
+        trust_remote_code: bool = False,
+    ) -> tuple[AutoModelForCausalLM, AutoTokenizer]:
         """Load model and tokenizer."""
         self.logger.info(f"Loading model: {model_name}")
 
@@ -42,9 +42,6 @@ class LLMLoader:
 
         if dtype is None:
             dtype = "auto"
-            trust_remote_code = False
-        else:
-            trust_remote_code = True
 
         try:
             # Load tokenizer
@@ -58,9 +55,19 @@ class LLMLoader:
             self.logger.debug("Loading model...")
             # Use device_map="auto" for CUDA to enable automatic multi-GPU, or None for CPU
             device_map_value = "auto" if device == "cuda" else None
+            # Resolve dtype string to torch dtype
+            torch_dtype_value: str | torch.dtype = dtype
+            if isinstance(dtype, str) and dtype != "auto":
+                dtype_map: dict[str, torch.dtype] = {
+                    "float16": torch.float16,
+                    "bfloat16": torch.bfloat16,
+                    "float32": torch.float32,
+                }
+                torch_dtype_value = dtype_map.get(dtype, dtype)  # type: ignore[assignment]
+
             model = AutoModelForCausalLM.from_pretrained(
                 model_name,
-                dtype=dtype,
+                torch_dtype=torch_dtype_value,
                 trust_remote_code=trust_remote_code,
                 device_map=device_map_value,
             )

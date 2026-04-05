@@ -129,7 +129,7 @@ class DatasetBuilder:
         # Initialize Jinja2 environment
         self.jinja_env = jinja2.Environment(
             loader=jinja2.PackageLoader("psyctl", "templates"),
-            autoescape=jinja2.select_autoescape(),
+            autoescape=False,
         )
 
         # Store custom template path
@@ -150,7 +150,7 @@ class DatasetBuilder:
         top_k: int | None = None,
         top_p: float | None = None,
         max_tokens: int = 100,
-        dtype: str = None,
+        dtype: str | None = None,
     ) -> Path:
         """
         Build steering dataset for given personality traits.
@@ -266,7 +266,7 @@ class DatasetBuilder:
         )
         return self.build_steer_dataset(*args, **kwargs)
 
-    def _load_model(self, model_name: str, dtype: str = None) -> None:
+    def _load_model(self, model_name: str, dtype: str | None = None) -> None:
         """
         Load model and tokenizer from Hugging Face.
 
@@ -842,12 +842,29 @@ class DatasetBuilder:
         self.logger.info(f"Output directory: {output_dir}")
         self.logger.info(f"Batch size: {INFERENCE_BATCH_SIZE}")
 
-        datetime_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_file = output_dir / f"caa_dataset_{datetime_str}.jsonl"
-        self.logger.info(f"Output file: {output_file}")
+        # Check for existing checkpoint in output directory
+        checkpoint = None
+        output_file = None
+        checkpoint_files = sorted(output_dir.glob("caa_dataset_*.checkpoint.json"))
+        if checkpoint_files:
+            # Try to resume from the most recent checkpoint
+            for cp_file in reversed(checkpoint_files):
+                try:
+                    with cp_file.open(encoding="utf-8") as f:
+                        checkpoint = json.load(f)
+                    output_file = Path(checkpoint["output_file"])
+                    if output_file.exists():
+                        break
+                    checkpoint = None
+                    output_file = None
+                except Exception as e:
+                    self.logger.warning(f"Failed to load checkpoint {cp_file}: {e}")
 
-        # Check for existing checkpoint
-        checkpoint = self._load_checkpoint(output_file)
+        if output_file is None:
+            datetime_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_file = output_dir / f"caa_dataset_{datetime_str}.jsonl"
+
+        self.logger.info(f"Output file: {output_file}")
         num_generated = checkpoint["num_generated"] if checkpoint else 0
 
         if checkpoint:
@@ -866,12 +883,8 @@ class DatasetBuilder:
         self.logger.debug(f"Neutral P2 generated: {neutral_p2[:200]}...")
 
         # Create templates with placeholder for character name
-        positive_template = positive_p2.replace("Xylo", "{{char}}").replace(
-            "Xylo", "{{char}}"
-        )
-        neutral_template = neutral_p2.replace("Xylo", "{{char}}").replace(
-            "Xylo", "{{char}}"
-        )
+        positive_template = positive_p2.replace("Xylo", "{{char}}")
+        neutral_template = neutral_p2.replace("Xylo", "{{char}}")
 
         # Collect contexts in batches
         batch_size = (
@@ -901,10 +914,17 @@ class DatasetBuilder:
         """Synchronous batch processing implementation."""
 
         context_batch = []
+        skip_count = num_generated  # Number of contexts to skip from checkpoint
+        skipped = 0
 
         for context in self._generate_sample_context(limit_samples):
             if num_generated >= limit_samples > 0:
                 break
+
+            # Skip contexts that were already processed in a previous run
+            if skipped < skip_count:
+                skipped += 1
+                continue
 
             context_batch.append(context)
 
@@ -1029,7 +1049,7 @@ class DatasetBuilder:
         )
 
         # Determine size category
-        if num_samples < 100 or num_samples < 1000:
+        if num_samples < 1000:
             size_category = "n<1K"
         elif num_samples < 10000:
             size_category = "1K<n<10K"

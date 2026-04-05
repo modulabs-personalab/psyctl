@@ -221,10 +221,15 @@ class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
         noise_removed = np.linalg.norm(raw_vector - denoised_vector)
         signal_preserved = np.linalg.norm(denoised_vector)
 
+        snr_str = (
+            f"{signal_preserved / noise_removed:.2f}x"
+            if noise_removed > 0
+            else "inf"
+        )
         self.logger.debug(
             f"Layer '{layer_name}': Denoised vector norm={signal_preserved:.4f}, "
             f"noise removed={noise_removed:.4f} "
-            f"(SNR improvement: {signal_preserved / noise_removed:.2f}x)"
+            f"(SNR improvement: {snr_str})"
         )
 
         # Convert back to torch tensor
@@ -262,6 +267,9 @@ class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
         # Register hooks that collect ALL samples
         hook_handles = []
 
+        # Store attention mask reference for hooks
+        current_attention_mask: list[torch.Tensor | None] = [None]
+
         for name, module in layer_modules.items():
             key = f"{name}_{suffix}"
 
@@ -270,15 +278,21 @@ class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
                     # Extract hidden states
                     hidden_states = output[0] if isinstance(output, tuple) else output
 
-                    # Take last token activation for each sample in batch
-                    # Shape: [batch_size, seq_len, hidden_dim]
-                    batch_acts = (
-                        hidden_states[:, -1, :].detach().cpu()
-                    )  # [batch_size, D]
+                    # Use attention mask to find last real token position
+                    attn_mask = current_attention_mask[0]
+                    batch_size_local = hidden_states.size(0)
 
-                    # Store each sample separately
-                    for i in range(batch_acts.size(0)):
-                        all_activations[storage_key].append(batch_acts[i])  # [D]
+                    for i in range(batch_size_local):
+                        if attn_mask is not None:
+                            real_positions = torch.where(attn_mask[i] == 1)[0]
+                            if len(real_positions) > 0:
+                                last_pos = real_positions[-1].item()
+                            else:
+                                last_pos = -1
+                        else:
+                            last_pos = -1
+                        act = hidden_states[i, last_pos, :].detach().cpu()
+                        all_activations[storage_key].append(act)
 
                 return hook_fn
 
@@ -306,6 +320,9 @@ class DenoisedMeanDifferenceVectorExtractor(BaseVectorExtractor):
                     # Move to model device
                     device = next(model.parameters()).device
                     inputs = {k: v.to(device) for k, v in inputs.items()}
+
+                    # Set attention mask for hooks
+                    current_attention_mask[0] = inputs.get("attention_mask")
 
                     # Forward pass (hooks will collect activations)
                     _ = model(**inputs)

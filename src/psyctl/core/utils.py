@@ -82,11 +82,9 @@ def validate_hf_token() -> str:
     """
     import os
 
-    import click
-
     token = os.getenv("HF_TOKEN")
     if not token:
-        raise click.ClickException(
+        raise ValueError(
             "HF_TOKEN environment variable is required for uploading to HuggingFace Hub.\n\n"
             "To set up your token:\n"
             "  1. Get token from https://huggingface.co/settings/tokens\n"
